@@ -377,29 +377,53 @@ async function api(url, opts) {
   return data;
 }
 
+
 async function showSettingsContent() {
   var c = document.getElementById('settingsContent');
   c.style.display = 'block';
   c.innerHTML = '<div class="loading">加载中...</div>';
+  var allUnlocked = window.wh_unlocked;
 
   try {
-    var [storeList, dishList, whData] = await Promise.all([
-      api('/api/admin/stores'),
-      api('/api/admin/dishes'),
-      api('/api/admin/settings/webhook'),
-    ]);
-    var whUrl = whData.webhook_url || '';
+    var regionList = await api('/api/admin/regions');
+    var dishList = await api('/api/admin/dishes');
+    var storeList = await api('/api/admin/stores');
 
-    var storeItems = storeList.map(function(s) {
-      return '<div style="background:#fafafa;border-radius:10px;padding:12px;margin-bottom:8px;">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;">' +
-          '<span><strong>' + s.name + '</strong> <span class="tag ' + (s.active?'tag-on':'tag-off') + '">' + (s.active?'启用':'停用') + '</span></span>' +
-          '<span style="display:flex;gap:4px;">' +
+    var regionHtml = regionList.map(function(r) {
+      var rStores = storeList.filter(function(s) { return Number(s.region_id) === r.id; });
+      var storeHtml = rStores.map(function(s) {
+        return '<div class="setting-item" style="margin-left:12px;">' +
+          '<span class="name">' + s.name + ' <span class="tag ' + (s.active?'tag-on':'tag-off') + '">' + (s.active?'启用':'停用') + '</span></span>' +
+          '<span class="actions">' +
             '<button class="btn btn-outline-sm btn-sm" onclick="editSettingStore(' + s.id + ')">编辑</button>' +
             '<button class="btn btn-outline-sm btn-sm" onclick="toggleSettingStore(' + s.id + ')">' + (s.active?'停用':'启用') + '</button>' +
             '<button class="btn btn-ghost-sm btn-sm" onclick="deleteSettingStore(' + s.id + ')">删除</button>' +
           '</span>' +
+        '</div>';
+      }).join('') || '<div style="color:#bbb;font-size:12px;margin-left:12px;">暂无门店</div>';
+
+      var whSection;
+      if (allUnlocked) {
+        whSection = '<div style="margin-top:8px;border-top:1px dashed #eee;padding-top:10px;">' +
+          '<div class="setting-row">' +
+            '<input id="wh_' + r.id + '" value="' + (r.webhook_url||'').replace(/"/g,'&quot;') + '" placeholder="Webhook 地址" style="flex:1;padding:7px 10px;border:2px solid #e8e8e8;border-radius:6px;font-size:13px;outline:none;font-family:inherit;">' +
+            '<button class="btn btn-green-sm btn-sm" onclick="saveRegionWebhook(' + r.id + ')">保存</button>' +
+            '<button class="btn btn-outline-sm btn-sm" onclick="testRegionWebhook(' + r.id + ')"' + (r.webhook_url?'':' disabled') + '>测试</button>' +
+          '</div>' +
+          '<div style="font-size:11px;color:var(--text-light);margin-top:4px;">该区域的提醒和汇总将发送到此群</div>' +
+        '</div>';
+      } else {
+        whSection = '<div style="font-size:11px;color:var(--text-light);margin-top:6px;text-align:center;">' +
+          (r.webhook_url ? '✅ 已配置机器人' : '❌ 未配置机器人') +
+        '</div>';
+      }
+
+      return '<div style="background:#fafafa;border-radius:10px;padding:12px;margin-bottom:12px;border-left:4px solid var(--primary);">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+          '<span><strong>' + r.name + '</strong></span>' +
         '</div>' +
+        storeHtml +
+        whSection +
       '</div>';
     }).join('');
 
@@ -414,17 +438,29 @@ async function showSettingsContent() {
       '</div>';
     }).join('');
 
+    var addRegionRow = '<div class="setting-row">' +
+      '<input id="newRegionInput" placeholder="新区域名称" onkeydown="if(event.key===\'Enter\')addSettingRegion()">' +
+      '<button class="btn btn-primary btn-sm" onclick="addSettingRegion()" style="padding:6px 14px;font-size:12px;color:#fff;white-space:nowrap;">新增区域</button>' +
+    '</div>';
+
+    var newStoreRow = '<div class="setting-row" style="margin-top:8px;">' +
+      '<input id="newStoreInput" placeholder="新门店名称" onkeydown="if(event.key===\'Enter\')addSettingStore()">' +
+      '<button class="btn btn-red-sm btn-sm" onclick="addSettingStore()">新增门店</button>' +
+    '</div>';
+
+    var unlockSection = allUnlocked
+      ? '<div style="text-align:center;margin-bottom:12px;"><button class="btn btn-ghost-sm btn-sm" onclick="lockWebhook()">🔒 锁定机器人设置</button></div>'
+      : '<div style="background:#FFF9F0;border:1px solid #F5ECD7;border-radius:10px;padding:14px;margin-bottom:12px;text-align:center;">' +
+          '<div style="font-size:14px;font-weight:600;color:var(--primary);margin-bottom:8px;">🔒 修改机器人设置</div>' +
+          '<input id="whAnswer" placeholder="我是谁？" style="width:200px;padding:7px 10px;border:2px solid #e8e8e8;border-radius:6px;font-size:14px;outline:none;font-family:inherit;text-align:center;" onkeydown="if(event.key===\'Enter\')unlockWebhook()">' +
+          '<div style="margin-top:6px;"><button class="btn btn-outline-sm btn-sm" onclick="unlockWebhook()">验证</button></div>' +
+          '<div id="whErr" style="font-size:12px;color:var(--red);margin-top:4px;"></div>' +
+        '</div>';
+
     c.innerHTML =
-      // ── 门店管理 ──
-      '<h3>🏪 门店管理</h3>' +
-      '<div class="setting-section">' +
-        '<div class="setting-row">' +
-          '<input id="newStoreInput" placeholder="新门店名称" onkeydown="if(event.key===\'Enter\')addSettingStore()">' +
-          '<button class="btn btn-red-sm btn-sm" onclick="addSettingStore()">新增门店</button>' +
-        '</div>' +
-        (storeItems || '<div style="color:#999;font-size:13px;">暂无门店</div>') +
-      '</div>' +
-      // ── 菜品管理 ──
+      '<h3>📋 区域管理</h3>' +
+      '<div class="setting-section">' + addRegionRow + newStoreRow + (regionHtml || '<div style="color:#999;font-size:13px;">暂无区域</div>') + '</div>' +
+      unlockSection +
       '<h3>🍆 菜品管理</h3>' +
       '<div class="setting-section">' +
         '<div class="setting-row">' +
@@ -433,32 +469,12 @@ async function showSettingsContent() {
         '</div>' +
         (dishItems || '<div style="color:#999;font-size:13px;">暂无菜品</div>') +
       '</div>' +
-      // ── 企业微信机器人（最下面，带暗号保护） ──
-      '<hr style="border:none;border-top:1px solid #eee;margin:16px 0;">' +
-      '<h3>📢 企业微信机器人</h3>' +
-      '<div class="setting-section" style="background:#FFF9F0;border:1px solid #F5ECD7;border-radius:10px;padding:14px;">' +
-        (window.wh_unlocked
-          ? '<label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Webhook 地址</label>' +
-            '<div class="setting-row">' +
-              '<input id="globalWhInput" value="' + whUrl.replace(/"/g,'&quot;') + '" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." style="flex:1;padding:7px 10px;border:2px solid #e8e8e8;border-radius:6px;font-size:13px;outline:none;font-family:inherit;">' +
-              '<button class="btn btn-green-sm btn-sm" onclick="saveGlobalWebhook()">保存</button>' +
-              '<button class="btn btn-outline-sm btn-sm" onclick="testGlobalWebhook()">测试</button>' +
-            '</div>' +
-            '<div style="font-size:11px;color:var(--text-light);margin-top:6px;">定时提醒和汇总每天自动推送到此群</div>' +
-            '<div style="margin-top:8px;"><button class="btn btn-ghost-sm btn-sm" onclick="lockWebhook()">🔒 锁定</button></div>'
-          : '<div style="text-align:center;padding:8px 0;">' +
-              '<div style="font-size:14px;font-weight:600;color:var(--primary);margin-bottom:8px;">🔒 修改机器人设置</div>' +
-              '<input id="whAnswer" placeholder="我是谁？" style="width:200px;padding:7px 10px;border:2px solid #e8e8e8;border-radius:6px;font-size:14px;outline:none;font-family:inherit;text-align:center;" onkeydown="if(event.key===\'Enter\')unlockWebhook()">' +
-              '<div style="margin-top:6px;"><button class="btn btn-outline-sm btn-sm" onclick="unlockWebhook()">验证</button></div>' +
-              '<div id="whErr" style="font-size:12px;color:var(--red);margin-top:4px;"></div>' +
-            '</div>'
-        ) +
-      '</div>' +
       '<div style="margin-top:16px;text-align:center;">' +
         '<button class="btn btn-outline-sm btn-sm" onclick="refreshSettings()">🔄 刷新</button>' +
         '<button class="btn btn-ghost-sm btn-sm" onclick="closeSettings()" style="margin-left:8px;">关闭</button>' +
       '</div>';
 
+    window._regionList = regionList;
     window._storeList = storeList;
     window._dishList = dishList;
   } catch (e) {
@@ -468,7 +484,6 @@ async function showSettingsContent() {
 
 function refreshSettings() { showSettingsContent(); }
 
-// ── Webhook 暗号验证 ──
 function unlockWebhook() {
   var inp = document.getElementById('whAnswer');
   var err = document.getElementById('whErr');
@@ -486,37 +501,53 @@ function lockWebhook() {
   showSettingsContent();
 }
 
-// ── 全局 Webhook ──
-async function saveGlobalWebhook() {
-  var inp = document.getElementById('globalWhInput');
+async function addSettingRegion() {
+  var inp = document.getElementById('newRegionInput');
+  var name = inp.value.trim();
+  if (!name) return toast('请输入区域名称');
+  try {
+    await api('/api/admin/regions', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name }),
+    });
+    inp.value = ''; toast('添加成功'); showSettingsContent();
+  } catch (e) { toast('添加失败：' + e.message, true); }
+}
+
+async function saveRegionWebhook(id) {
+  var inp = document.getElementById('wh_' + id);
   if (!inp) return;
   var url = inp.value.trim();
-  if (!url) url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=44356646-0dda-484b-9a79-fa0ad45b8a50';
+  var region = window._regionList.find(function(r) { return r.id === id; });
+  if (!region) return;
   try {
-    await api('/api/admin/settings/webhook', {
+    await api('/api/admin/regions/' + id, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ webhook_url: url }),
+      body: JSON.stringify({ name: region.name, webhook_url: url }),
     });
     toast('Webhook 已保存');
   } catch (e) { toast('保存失败：' + e.message, true); }
 }
 
-async function testGlobalWebhook() {
+async function testRegionWebhook(id) {
   try {
-    var r = await api('/api/admin/settings/test-webhook', { method: 'POST' });
+    var r = await api('/api/admin/regions/' + id + '/test-webhook', { method: 'POST' });
     toast(r.success ? '✅ 测试消息发送成功！请查看企微群' : '❌' + (r.error || '发送失败'));
   } catch (e) { toast('❌' + e.message, true); }
 }
 
-// ── 门店操作 ──
 async function addSettingStore() {
   var inp = document.getElementById('newStoreInput');
   var name = inp.value.trim();
   if (!name) return toast('请输入门店名称');
+  var regionId = 1;
+  if (window._regionList && window._regionList.length > 0) {
+    regionId = window._regionList[0].id;
+  }
   try {
     await api('/api/admin/stores', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name }),
+      body: JSON.stringify({ name: name, region_id: regionId }),
     });
     inp.value = ''; toast('添加成功'); showSettingsContent();
     refreshStores();
@@ -527,9 +558,7 @@ function editSettingStore(id) {
   var store = window._storeList.find(function(s) { return s.id === id; });
   if (!store) return;
   var newName = prompt('修改门店名称：', store.name);
-  if (newName && newName.trim()) {
-    saveSettingStore(id, newName.trim());
-  }
+  if (newName && newName.trim()) { saveSettingStore(id, newName.trim()); }
 }
 
 async function saveSettingStore(id, name) {
@@ -538,31 +567,23 @@ async function saveSettingStore(id, name) {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name }),
     });
-    toast('修改成功'); showSettingsContent();
-    refreshStores();
+    toast('修改成功'); showSettingsContent(); refreshStores();
   } catch (e) { toast('修改失败：' + e.message, true); }
 }
 
 async function toggleSettingStore(id) {
-  try {
-    await api('/api/admin/stores/' + id + '/toggle', { method: 'PUT' });
-    toast('状态已切换'); showSettingsContent();
-    refreshStores();
-  } catch (e) { toast('操作失败：' + e.message, true); }
+  try { await api('/api/admin/stores/' + id + '/toggle', { method: 'PUT' }); toast('状态已切换'); showSettingsContent(); refreshStores(); }
+  catch (e) { toast('操作失败：' + e.message, true); }
 }
 
 async function deleteSettingStore(id) {
   var store = window._storeList.find(function(s) { return s.id === id; });
   if (!store) return;
   if (!confirm('确定要删除门店「' + store.name + '」吗？历史记录保留。')) return;
-  try {
-    await api('/api/admin/stores/' + id, { method: 'DELETE' });
-    toast('已删除'); showSettingsContent();
-    refreshStores();
-  } catch (e) { toast('删除失败：' + e.message, true); }
+  try { await api('/api/admin/stores/' + id, { method: 'DELETE' }); toast('已删除'); showSettingsContent(); refreshStores(); }
+  catch (e) { toast('删除失败：' + e.message, true); }
 }
 
-// ── 菜品操作 ──
 async function addSettingDish() {
   var inp = document.getElementById('newDishInput');
   var name = inp.value.trim();
@@ -580,39 +601,27 @@ function editSettingDish(id) {
   var dish = window._dishList.find(function(d) { return d.id === id; });
   if (!dish) return;
   var newName = prompt('修改菜品名称：', dish.name);
-  if (newName && newName.trim()) {
-    saveSettingDish(id, newName.trim());
-  }
+  if (newName && newName.trim()) { saveSettingDish(id, newName.trim()); }
 }
 
 async function saveSettingDish(id, name) {
-  try {
-    await api('/api/admin/dishes/' + id, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name }),
-    });
-    toast('修改成功'); showSettingsContent();
-  } catch (e) { toast('修改失败：' + e.message, true); }
+  try { await api('/api/admin/dishes/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name }) }); toast('修改成功'); showSettingsContent(); }
+  catch (e) { toast('修改失败：' + e.message, true); }
 }
 
 async function toggleSettingDish(id) {
-  try {
-    await api('/api/admin/dishes/' + id + '/toggle', { method: 'PUT' });
-    toast('状态已切换'); showSettingsContent();
-  } catch (e) { toast('操作失败：' + e.message, true); }
+  try { await api('/api/admin/dishes/' + id + '/toggle', { method: 'PUT' }); toast('状态已切换'); showSettingsContent(); }
+  catch (e) { toast('操作失败：' + e.message, true); }
 }
 
 async function deleteSettingDish(id) {
   var dish = window._dishList.find(function(d) { return d.id === id; });
   if (!dish) return;
   if (!confirm('确定删除菜品「' + dish.name + '」吗？')) return;
-  try {
-    await api('/api/admin/dishes/' + id, { method: 'DELETE' });
-    toast('已删除'); showSettingsContent();
-  } catch (e) { toast('删除失败：' + e.message, true); }
+  try { await api('/api/admin/dishes/' + id, { method: 'DELETE' }); toast('已删除'); showSettingsContent(); }
+  catch (e) { toast('删除失败：' + e.message, true); }
 }
 
-// ── 刷新门店下拉 ──
 async function refreshStores() {
   try {
     var res = await fetch(API + '/api/stores');
@@ -621,8 +630,46 @@ async function refreshStores() {
   } catch (_) {}
 }
 
-// ── 启动 ──
+// ── 提交时带 regionId ──
+async function handleSubmit() {
+  if (submitting || !selectedStoreId) return;
+  submitting = true;
+  var btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = '提交中...';
+  try {
+    var store = null;
+    for (var i = 0; i < stores.length; i++) {
+      if (stores[i].id === selectedStoreId) { store = stores[i]; break; }
+    }
+    if (!store) throw new Error('门店不存在');
+    var items = dishes.map(function(d) {
+      return { dish_id: d.id, dish_name: d.name, quantity: quantities[d.id] || 0 };
+    });
+    var res = await fetch(API + '/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        storeId: selectedStoreId,
+        regionId: store.region_id || 0,
+        storeName: store.name,
+        date: TODAY,
+        items: items,
+        submitTime: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
+      }),
+    });
+    var data = await res.json();
+    if (data.success) {
+      renderSuccess(store.name);
+    } else {
+      alert('提交失败：' + (data.error || '未知错误'));
+      btn.disabled = false; btn.textContent = '确认提交';
+    }
+  } catch (e) {
+    alert('网络错误：' + e.message);
+    btn.disabled = false; btn.textContent = '确认提交';
+  }
+  submitting = false;
+}
+
 init();
-</script>
-</body>
-</html>
