@@ -13,28 +13,24 @@
   --radius: 12px; --shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: var(--bg); color: var(--text); min-height: 100vh;
-  display: flex; justify-content: center; padding: 16px;
-}
-.container { width: 100%; max-width: 560px; }
-.header {
-  background: linear-gradient(135deg, #5C0A0A 0%, #9B1B1B 30%, #7A1212 70%, #5C0A0A 100%);
-  color:#fff; padding:14px 16px; border-radius:var(--radius) var(--radius) 0 0;
+body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; justify-content:center; padding:16px; }
+.container { width:100%; max-width:560px; }
+
+/* ── Header ── */
+.page-header {
+  background:linear-gradient(135deg,#5C0A0A 0%,#9B1B1B 30%,#7A1212 70%,#5C0A0A 100%);
+  color:#fff; padding:10px 14px; border-radius:var(--radius) var(--radius) 0 0;
   display:flex; align-items:center; justify-content:space-between;
   border-bottom:2px solid rgba(201,169,110,0.55);
 }
-.header-left { display:flex; align-items:center; gap:10px; }
-.header-left img { height:32px; }
-.header-left h1 { font-size:17px; font-weight:700; letter-spacing:1px; }
-.header-left p { font-size:11px; opacity:0.8; color:var(--gold); }
-.settings-btn {
-  background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
-  color:#fff; width:36px; height:36px; border-radius:8px; cursor:pointer;
-  font-size:18px; display:flex; align-items:center; justify-content:center;
-}
-.settings-btn:hover { background:rgba(255,255,255,0.25); }
+.header-left { display:flex; align-items:center; gap:8px; }
+.header-left img { height:28px; }
+.header-left h1 { font-size:16px; font-weight:700; letter-spacing:1px; }
+.header-left p { font-size:10px; opacity:0.8; color:var(--gold); }
+.header-btn { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; }
+.header-btn:hover { background:rgba(255,255,255,0.25); }
+
+/* ── Content ── */
 .content-card { background:var(--card-bg); border-radius:0 0 var(--radius) var(--radius); padding:16px; box-shadow:var(--shadow); min-height:300px; }
 .form-group { margin-bottom:16px; }
 .form-group label { display:block; font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px; }
@@ -50,14 +46,14 @@ body {
 .dish-input button:active { background:var(--gold-light); border-color:var(--gold); }
 .dish-input input { width:56px; text-align:center; font-size:16px; font-weight:600; padding:6px; border:2px solid #e8e8e8; border-radius:8px; outline:none; font-family:inherit; -moz-appearance:textfield; }
 .dish-input input:focus { border-color:var(--primary); }
-.dish-input input::-webkit-outer-spin-button, .dish-input input::-webkit-inner-spin-button { -webkit-appearance:none; }
+.dish-input input::-webkit-outer-spin-button,.dish-input input::-webkit-inner-spin-button { -webkit-appearance:none; }
 .btn { display:block; width:100%; padding:12px; font-size:15px; font-weight:700; border:none; border-radius:10px; cursor:pointer; font-family:inherit; text-align:center; transition:all .2s; }
 .btn-primary { background:linear-gradient(135deg,var(--primary),#D4443F); color:#fff; letter-spacing:2px; }
 .btn-primary:hover { transform:translateY(-1px); }
 .btn-primary:disabled { background:#ccc; cursor:not-allowed; transform:none; }
 .btn-secondary { background:#f5f5f5; color:var(--text); margin-top:8px; }
 .btn-secondary:hover { background:#e8e8e8; }
-.region-pills { display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; margin-bottom:8px; }
+.region-pills { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
 .region-pill { flex-shrink:0; padding:8px 16px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer; border:2px solid #e8e8e8; background:#fff; transition:all .2s; white-space:nowrap; font-family:inherit; }
 .region-pill:hover { border-color:var(--gold); }
 .region-pill.active { background:var(--primary); color:#fff; border-color:var(--primary); }
@@ -75,112 +71,107 @@ body {
 .toast { position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:9999; background:#333; color:#fff; padding:10px 20px; border-radius:8px; font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; }
 .toast.show { opacity:1; }
 .toast.error { background:var(--red); }
-.settings-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:200; align-items:center; justify-content:center; }
-.settings-overlay.show { display:flex; }
-.settings-panel { background:#fff; border-radius:16px; padding:0; width:520px; max-width:92vw; max-height:88vh; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.2); display:flex; flex-direction:column; }
-.settings-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid #eee; flex-shrink:0; }
-.settings-header h2 { font-size:17px; font-weight:700; }
-.settings-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-light); padding:0 4px; }
-.settings-nav { display:flex; flex-shrink:0; }
-.settings-nav-item { flex:1; text-align:center; padding:10px; font-size:13px; font-weight:600; color:var(--text-light); cursor:pointer; border-bottom:2px solid #eee; background:#fafafa; transition:all .2s; }
-.settings-nav-item.active { color:var(--primary); border-bottom-color:var(--primary); background:#fff; }
-.settings-body { padding:16px 20px; overflow-y:auto; flex:1; }
+
+/* ── 设置页通配 ── */
 .setting-section { margin-bottom:16px; }
-.setting-section-title { font-size:14px; color:var(--text); margin-bottom:8px; }
+.setting-section-title { font-size:14px; color:var(--text); margin-bottom:8px; font-weight:600; }
 .setting-row { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
-.setting-row input { flex:1; margin-bottom:0; }
+.setting-row input { flex:1; padding:7px 10px; border:2px solid #e8e8e8; border-radius:6px; font-size:13px; outline:none; font-family:inherit; }
+.setting-row input:focus { border-color:var(--primary); }
 .setting-card { background:#fafafa; border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; }
-.setting-card .left { flex:1; }
 .setting-card .name { font-size:14px; font-weight:600; }
-.setting-card .sub { font-size:11px; color:var(--text-light); }
 .setting-card .actions { display:flex; gap:4px; flex-shrink:0; }
 .btn-sm { padding:5px 10px; font-size:11px; border-radius:6px; border:none; cursor:pointer; font-weight:600; font-family:inherit; white-space:nowrap; }
 .btn-red-sm { background:var(--primary); color:#fff; }
 .btn-green-sm { background:var(--green); color:#fff; }
 .btn-outline-sm { background:#fff; color:var(--primary); border:1.5px solid var(--primary); }
-.btn-ghost-sm { background:none; color:var(--text-light); border:none; }
+.btn-ghost-sm { background:none; color:var(--text-light); border:none; cursor:pointer; }
 .btn-ghost-sm:hover { color:var(--primary); }
 .tag { display:inline-block; padding:1px 6px; border-radius:6px; font-size:10px; font-weight:600; }
 .tag-on { background:var(--green-bg); color:var(--green); }
 .tag-off { background:var(--red-bg); color:var(--red); }
+
+/* ── 设置底部tab ── */
+.setting-tabs { display:flex; border-top:1px solid #eee; margin-top:16px; background:#fff; border-radius:0 0 var(--radius) var(--radius); }
+.setting-tab { flex:1; text-align:center; padding:12px; font-size:14px; font-weight:600; color:var(--text-light); cursor:pointer; border-top:2px solid transparent; transition:all .2s; }
+.setting-tab.active { color:var(--primary); border-top-color:var(--primary); }
+.setting-tab .tab-icon { font-size:18px; display:block; margin-bottom:2px; }
 </style>
 </head>
 <body>
 <div class="container" id="app">
-  <div class="header">
-    <div class="header-left">
+  <!-- 页面Header（动态变化） -->
+  <div class="page-header" id="pageHeader">
+    <div class="header-left" id="headerLeft">
       <img src="/logo.png" alt="湘阁里辣">
       <div>
-        <h1>不能隔夜菜品上报</h1>
-        <p id="headerDate"></p>
+        <h1 id="pageTitle">不能隔夜菜品上报</h1>
+        <p id="pageSub"></p>
       </div>
     </div>
-    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    <button class="header-btn" id="headerBtn" onclick="onHeaderBtn()">⚙️ 设置</button>
   </div>
-  <div class="content-card">
-    <div id="main-content" class="loading">加载中...</div>
+  <div class="content-card" id="contentCard">
+    <div id="mainContent" class="loading">加载中...</div>
+  </div>
+  <!-- 设置底部导航（仅设置页显示） -->
+  <div id="settingTabs" style="display:none;" class="setting-tabs">
+    <div class="setting-tab active" onclick="showSetting('stores')"><span class="tab-icon">🏪</span>门店</div>
+    <div class="setting-tab" onclick="showSetting('dishes')"><span class="tab-icon">🍆</span>菜品</div>
+    <div class="setting-tab" onclick="showSetting('robot')"><span class="tab-icon">🤖</span>机器人</div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
-<div class="settings-overlay" id="settingsOverlay">
-  <div class="settings-panel" id="settingsPanel">
-    <div class="settings-header">
-      <h2>⚙️ 设置</h2>
-      <button class="settings-close" onclick="closeSettings()">✕</button>
-    </div>
-    <div class="settings-nav" id="settingsNav">
-      <div class="settings-nav-item active" data-tab="regions" onclick="switchSettingTab('regions')"><span class="nav-icon">🏪</span>门店</div>
-      <div class="settings-nav-item" data-tab="dishes" onclick="switchSettingTab('dishes')"><span class="nav-icon">🍆</span>菜品</div>
-      <div class="settings-nav-item" data-tab="robot" onclick="switchSettingTab('robot')"><span class="nav-icon">🤖</span>机器人</div>
-    </div>
-    <div class="settings-body" id="settingsBody"><div class="loading" style="padding:20px;">加载中...</div></div>
-  </div>
-</div>
-
 <script>
 var API='',TODAY=new Date().toISOString().split('T')[0];
-var stores=[],dishes=[],regions=[],quantities={},selectedStoreId=null,selectedRegionId=null,submitting=false;
+var stores=[],dishes=[],regions=[],quantities={},selectedStoreId=null,selectedRegionId=null,submitting=false,currentPage='home',settingTab='stores',
+    _storeList=[],_dishList=[],_regionList=[];
 function toast(m,e){var el=document.getElementById('toast');el.textContent=m;el.className='toast'+(e?' error':'');el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2000);}
-document.getElementById('headerDate').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric'})+' · 请于20:00前填报';
+document.getElementById('pageSub').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric'})+' · 请于20:00前填报';
 
-async function init(){
-  var m=document.getElementById('main-content');
+async function api(u,o){o=o||{};var r=await fetch(API+u,o);var d=await r.json();if(!r.ok)throw new Error(d.error||'请求失败');return d;}
+
+// ══════════════ 首页（填报） ══════════════
+
+async function goHome(){
+  currentPage='home';
+  document.getElementById('headerLeft').innerHTML='<img src="/logo.png" alt="湘阁里辣"><div><h1>不能隔夜菜品上报</h1><p id="pageSub2"></p></div>';
+  document.getElementById('pageSub2').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric'})+' · 请于20:00前填报';
+  document.getElementById('headerBtn').textContent='⚙️ 设置';
+  document.getElementById('headerBtn').onclick=function(){goSetting()};
+  document.getElementById('settingTabs').style.display='none';
+  var m=document.getElementById('mainContent');
   try{
     var r=await Promise.all([fetch(API+'/api/stores'),fetch(API+'/api/dishes'),fetch(API+'/api/admin/regions')]);
     stores=await r[0].json();dishes=await r[1].json();regions=await r[2].json();
     if(!stores.length||!dishes.length){m.innerHTML='<div class="error-box">暂无可选门店或菜品，请联系管理员配置。</div>';return;}
     dishes.forEach(function(d){quantities[d.id]=0});
     if(!selectedRegionId&&regions.length)selectedRegionId=regions[0].id;
-    renderPickers();
-  }catch(e){m.innerHTML='<div class="error-box">加载失败：'+e.message+'<br>请检查网络后刷新页面</div>';}
+    renderHome();
+  }catch(e){m.innerHTML='<div class="error-box">加载失败：'+e.message+'</div>';}
 }
 
-function renderPickers(){
-  var m=document.getElementById('main-content');
+function renderHome(){
+  var m=document.getElementById('mainContent');
   var filtered=selectedRegionId?stores.filter(function(s){return Number(s.region_id)===Number(selectedRegionId)}):stores;
   var rName='';if(regions.length){var rt=regions.find(function(x){return x.id===Number(selectedRegionId)});if(rt)rName=rt.name;}
-  var pills=regions.map(function(r){var c=stores.filter(function(s){return Number(s.region_id)===r.id}).length;return '<button class="region-pill'+(Number(selectedRegionId)===r.id?' active':'')+'" onclick="selRegion('+r.id+')">'+r.name+' <span class="count">'+c+'</span></button>';}).join('');
+  var pills=regions.map(function(r){var c=stores.filter(function(s){return Number(s.region_id)===r.id}).length;return '<button class="region-pill'+(Number(selectedRegionId)===r.id?' active':'')+'" onclick="selR('+r.id+')">'+r.name+' <span class="count">'+c+'</span></button>';}).join('');
   if(selectedStoreId){
     var store=stores.find(function(s){return s.id===selectedStoreId});
-    if(!store){selectedStoreId=null;renderPickers();return;}
-    renderDishForm(rName,pills,store);
+    if(!store){selectedStoreId=null;renderHome();return;}
+    var items=dishes.map(function(d){return '<div class="dish-item"><span class="dish-name">'+d.name+'</span><div class="dish-input"><button onclick="chg('+d.id+',-1)">−</button><input type="number" id="q'+d.id+'" value="'+(quantities[d.id]||0)+'" min="0" onchange="onc('+d.id+',this.value)" onfocus="this.select()"><button onclick="chg('+d.id+',1)">+</button></div></div>';}).join('');
+    m.innerHTML=(pills?'<div class="region-pills">'+pills+'</div>':'')+
+      '<div class="form-group"><label>🏪 '+rName+' · '+store.name+'</label><div style="display:flex;gap:6px;margin-top:4px;"><button class="btn btn-outline-sm btn-sm" onclick="selectedStoreId=null;renderHome()" style="padding:4px 10px;font-size:12px;">⬅ 换门店</button><button class="btn btn-outline-sm btn-sm" onclick="selectedRegionId=null;selectedStoreId=null;renderHome()" style="padding:4px 10px;font-size:12px;">⬅ 换区域</button></div></div>'+
+      '<div class="form-group"><label>📋 菜品剩余数量</label><p style="font-size:12px;color:var(--text-light);margin:-4px 0 8px;">卖完填0，没有余量的可不填</p><div class="dish-list">'+items+'</div></div>'+
+      '<button class="btn btn-primary" id="btnSubmit" onclick="submit()">确认提交</button>';
   }else{
-    var chips=filtered.map(function(s){return '<button class="store-chip" onclick="selStore('+s.id+')">'+s.name+'</button>';}).join('');
+    var chips=filtered.map(function(s){return '<button class="store-chip" onclick="selS('+s.id+')">'+s.name+'</button>';}).join('');
     m.innerHTML='<div class="form-group"><label>📋 选择区域</label><div class="region-pills">'+(pills||'<span style="color:#999;font-size:13px;">暂无区域</span>')+'</div></div><div class="form-group"><label>🏪 选择门店</label><div class="store-inline">'+(chips||'<span style="color:#999;font-size:13px;">该区域暂无门店</span>')+'</div></div>';
   }
 }
-function selRegion(id){selectedRegionId=id;selectedStoreId=null;renderPickers();}
-function selStore(id){selectedStoreId=id;renderPickers();}
-
-function renderDishForm(rName,pills,store){
-  var m=document.getElementById('main-content');
-  var items=dishes.map(function(d){return '<div class="dish-item"><span class="dish-name">'+d.name+'</span><div class="dish-input"><button onclick="chg('+d.id+',-1)">−</button><input type="number" id="q'+d.id+'" value="'+(quantities[d.id]||0)+'" min="0" onchange="onc('+d.id+',this.value)" onfocus="this.select()"><button onclick="chg('+d.id+',1)">+</button></div></div>';}).join('');
-  m.innerHTML=(pills?'<div class="region-pills">'+pills+'</div>':'')+
-    '<div class="form-group"><label>🏪 '+rName+' · '+store.name+'</label><div style="display:flex;gap:6px;margin-top:4px;"><button class="btn btn-outline-sm btn-sm" onclick="selectedStoreId=null;renderPickers()" style="padding:4px 10px;">⬅ 换门店</button><button class="btn btn-outline-sm btn-sm" onclick="selectedRegionId=null;selectedStoreId=null;renderPickers()" style="padding:4px 10px;">⬅ 换区域</button></div></div>'+
-    '<div class="form-group"><label>📋 菜品剩余数量</label><p style="font-size:12px;color:var(--text-light);margin:-4px 0 8px;">卖完填0，没有余量的可不填</p><div class="dish-list">'+items+'</div></div>'+
-    '<button class="btn btn-primary" id="btnSubmit" onclick="submit()">确认提交</button>';
-}
+function selR(id){selectedRegionId=id;selectedStoreId=null;renderHome();}
+function selS(id){selectedStoreId=id;renderHome();}
 function chg(id,d){quantities[id]=Math.max(0,(quantities[id]||0)+d);var e=document.getElementById('q'+id);if(e)e.value=quantities[id];}
 function onc(id,v){var n=parseInt(v,10);quantities[id]=isNaN(n)||n<0?0:n;var e=document.getElementById('q'+id);if(e)e.value=quantities[id];}
 
@@ -192,80 +183,95 @@ async function submit(){
     var items=dishes.map(function(d){return{dish_id:d.id,dish_name:d.name,quantity:quantities[d.id]||0}});
     var r=await fetch(API+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({storeId:selectedStoreId,regionId:store.region_id||0,storeName:store.name,date:TODAY,items:items,submitTime:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})})});
     var d=await r.json();
-    if(d.success){var m=document.getElementById('main-content');m.innerHTML='<div class="success-page"><div class="icon">✅</div><h2>提交成功！</h2><p>门店「'+store.name+'」<br>今日数据已提交</p><button class="btn btn-primary" onclick="resetForm()">⬅ 返回填报</button><button class="btn btn-secondary" onclick="resetForm()">继续填报其他门店</button></div>';}
-    else{alert('提交失败：'+(d.error||'未知错误'));btn.disabled=false;btn.textContent='确认提交';}
+    if(d.success){
+      var m=document.getElementById('mainContent');
+      m.innerHTML='<div class="success-page"><div class="icon">✅</div><h2>提交成功！</h2><p>门店「'+store.name+'」<br>今日数据已提交</p><button class="btn btn-primary" onclick="resetForm()">⬅ 返回填报</button><button class="btn btn-secondary" onclick="resetForm()">继续填报其他门店</button></div>';
+    }else{alert('提交失败：'+(d.error||'未知错误'));btn.disabled=false;btn.textContent='确认提交';}
   }catch(e){alert('网络错误：'+e.message);btn.disabled=false;btn.textContent='确认提交';}
   submitting=false;
 }
+function resetForm(){dishes.forEach(function(d){quantities[d.id]=0});selectedStoreId=null;renderHome();}
 
-function resetForm(){dishes.forEach(function(d){quantities[d.id]=0});selectedStoreId=null;renderPickers();}
+// ══════════════ 设置页 ══════════════
 
-// ── 设置 ──
-var settingTab='regions';
-function openSettings(){document.getElementById('settingsOverlay').classList.add('show');settingTab='regions';showSTab('regions');}
-function closeSettings(){document.getElementById('settingsOverlay').classList.remove('show');}
-document.getElementById('settingsOverlay').addEventListener('click',function(e){if(e.target===this)closeSettings();});
-function switchSettingTab(t){settingTab=t;document.querySelectorAll('.settings-nav-item').forEach(function(x){x.classList.toggle('active',x.dataset.tab===t)});showSTab(t);}
-
-async function api(u,o){o=o||{};var r=await fetch(API+u,o);var d=await r.json();if(!r.ok)throw new Error(d.error||'请求失败');return d;}
-
-async function showSTab(tab){
-  var b=document.getElementById('settingsBody');b.innerHTML='<div class="loading" style="padding:20px;">加载中...</div>';
-  try{
-    var sl=await api('/api/admin/stores'),dl=await api('/api/admin/dishes'),rl=await api('/api/admin/regions');
-    window._sl=sl;window._dl=dl;window._rl=rl;
-    if(tab==='regions')renderSRegions(b,rl,sl);
-    else if(tab==='dishes')renderSDishes(b,dl);
-    else if(tab==='robot')renderSRobot(b,rl);
-  }catch(e){b.innerHTML='<div style="color:var(--red);text-align:center;padding:20px;">加载失败：'+e.message+'</div>';}
+async function goSetting(){
+  currentPage='setting';
+  document.getElementById('headerLeft').innerHTML='<div><h1>⚙️ 设置</h1><p style="font-size:11px;opacity:0.8;color:var(--gold);">管理门店、菜品与机器人</p></div>';
+  document.getElementById('headerBtn').textContent='⬅ 返回';
+  document.getElementById('headerBtn').onclick=function(){goHome()};
+  document.getElementById('settingTabs').style.display='flex';
+  document.getElementById('mainContent').innerHTML='<div class="loading">加载中...</div>';
+  settingTab='stores';
+  document.querySelectorAll('.setting-tab').forEach(function(t){t.classList.remove('active');t.classList.toggle('active',t.textContent.includes('门店'))});
+  await loadSetting('stores');
 }
 
-function renderSRegions(b,rl,sl){
-  var h='<div class="setting-section"><div class="setting-section-title">新增区域</div><div class="setting-row"><input id="newR" placeholder="区域名称" onkeydown="if(event.key===\'Enter\')addR()"><button class="btn btn-red-sm btn-sm" onclick="addR()">新增</button></div></div>';
-  rl.forEach(function(r){
-    var rs=sl.filter(function(s){return Number(s.region_id)===r.id});
-    h+='<div class="setting-card" style="flex-wrap:wrap;"><div class="left" style="width:100%;margin-bottom:6px;"><span class="name">'+r.name+'</span></div><div style="width:100%;"><div class="setting-row" style="margin-bottom:4px;"><input id="ns_'+r.id+'" placeholder="新门店" onkeydown="if(event.key===\'Enter\')addS('+r.id+')"><button class="btn btn-green-sm btn-sm" onclick="addS('+r.id+')">+门店</button></div>';
+function showSetting(tab){
+  settingTab=tab;
+  document.querySelectorAll('.setting-tab').forEach(function(t){t.classList.remove('active');t.classList.toggle('active',t.dataset.tab===tab||t.textContent.includes({stores:'门店',dishes:'菜品',robot:'机器人'}[tab]));});
+  document.getElementById('mainContent').innerHTML='<div class="loading">加载中...</div>';
+  loadSetting(tab);
+}
+
+async function loadSetting(tab){
+  var m=document.getElementById('mainContent');
+  try{
+    _storeList=await api('/api/admin/stores');
+    _dishList=await api('/api/admin/dishes');
+    _regionList=await api('/api/admin/regions');
+    if(tab==='stores')renderStoresSetting(m);
+    else if(tab==='dishes')renderDishesSetting(m);
+    else if(tab==='robot')renderRobotSetting(m);
+  }catch(e){m.innerHTML='<div class="error-box">加载失败：'+e.message+'</div>';}
+}
+
+function renderStoresSetting(m){
+  var h='<div class="setting-section"><div class="setting-section-title">➕ 新增区域</div><div class="setting-row"><input id="newR" placeholder="区域名称" onkeydown="if(event.key===\'Enter\')addR()"><button class="btn btn-red-sm btn-sm" onclick="addR()">新增</button></div></div>';
+  _regionList.forEach(function(r){
+    var rs=_storeList.filter(function(s){return Number(s.region_id)===r.id});
+    h+='<div class="setting-card" style="flex-wrap:wrap;"><div class="left" style="width:100%;margin-bottom:6px;"><span class="name">📍 '+r.name+'</span></div><div style="width:100%;"><div class="setting-row" style="margin-bottom:4px;"><input id="ns_'+r.id+'" placeholder="门店名称" onkeydown="if(event.key===\'Enter\')addS('+r.id+')"><button class="btn btn-green-sm btn-sm" onclick="addS('+r.id+')">+门店</button></div>';
     rs.forEach(function(s){h+='<div class="setting-card" style="margin:4px 0;padding:6px 10px;"><span class="name" style="font-size:13px;">'+s.name+' <span class="tag '+(s.active?'tag-on':'tag-off')+'">'+(s.active?'启用':'停用')+'</span></span><span class="actions"><button class="btn btn-outline-sm btn-sm" onclick="editS('+s.id+')">编辑</button><button class="btn btn-outline-sm btn-sm" onclick="togS('+s.id+')">'+(s.active?'停用':'启用')+'</button><button class="btn btn-ghost-sm btn-sm" onclick="delS('+s.id+')">删除</button></span></div>';});
     if(!rs.length)h+='<div style="color:#bbb;font-size:12px;margin:4px 0;">暂无门店</div>';
     h+='</div></div>';
   });
-  h+='<div style="text-align:center;margin-top:8px;"><button class="btn btn-outline-sm btn-sm" onclick="showSTab(\'regions\')">🔄 刷新</button></div>';
-  b.innerHTML=h;
+  h+='<div style="text-align:center;"><button class="btn btn-ghost-sm btn-sm" onclick="loadSetting(\'stores\')">\U0001F504 刷新</button></div>';
+  m.innerHTML=h;
 }
 
-function renderSDishes(b,dl){
-  var items=dl.map(function(d){return '<div class="setting-card"><span class="name">'+d.name+' <span class="tag '+(d.active?'tag-on':'tag-off')+'">'+(d.active?'启用':'停用')+'</span></span><span class="actions"><button class="btn btn-outline-sm btn-sm" onclick="editD('+d.id+')">编辑</button><button class="btn btn-outline-sm btn-sm" onclick="togD('+d.id+')">'+(d.active?'停用':'启用')+'</button><button class="btn btn-ghost-sm btn-sm" onclick="delD('+d.id+')">删除</button></span></div>';}).join('');
-  b.innerHTML='<div class="setting-section"><div class="setting-section-title">新增菜品</div><div class="setting-row"><input id="newD" placeholder="菜品名称" onkeydown="if(event.key===\'Enter\')addD()"><button class="btn btn-green-sm btn-sm" onclick="addD()">新增</button></div>'+(items||'<div style="color:#999;font-size:13px;">暂无菜品</div>')+'</div><div style="text-align:center;margin-top:8px;"><button class="btn btn-outline-sm btn-sm" onclick="showSTab(\'dishes\')">🔄 刷新</button></div>';
+function renderDishesSetting(m){
+  var items=_dishList.map(function(d){return '<div class="setting-card"><span class="name">'+d.name+' <span class="tag '+(d.active?'tag-on':'tag-off')+'">'+(d.active?'启用':'停用')+'</span></span><span class="actions"><button class="btn btn-outline-sm btn-sm" onclick="editD('+d.id+')">编辑</button><button class="btn btn-outline-sm btn-sm" onclick="togD('+d.id+')">'+(d.active?'停用':'启用')+'</button><button class="btn btn-ghost-sm btn-sm" onclick="delD('+d.id+')">删除</button></span></div>';}).join('');
+  m.innerHTML='<div class="setting-section"><div class="setting-section-title">➕ 新增菜品</div><div class="setting-row"><input id="newD" placeholder="菜品名称" onkeydown="if(event.key===\'Enter\')addD()"><button class="btn btn-green-sm btn-sm" onclick="addD()">新增</button></div>'+(items||'<div style="color:#999;font-size:13px;">暂无菜品</div>')+'</div><div style="text-align:center;"><button class="btn btn-ghost-sm btn-sm" onclick="loadSetting(\'dishes\')">\U0001F504 刷新</button></div>';
 }
 
-function renderSRobot(b,rl){
+function renderRobotSetting(m){
   if(!window._whU){
-    b.innerHTML='<div style="background:#FFF9F0;border:1px solid #F5ECD7;border-radius:10px;padding:24px;text-align:center;margin-top:20px;"><div style="font-size:24px;margin-bottom:8px;">🔒</div><div style="font-size:16px;font-weight:600;color:var(--primary);margin-bottom:12px;">修改机器人设置</div><input id="whA" placeholder="我是谁？" style="width:220px;padding:8px 12px;border:2px solid #e8e8e8;border-radius:8px;font-size:15px;outline:none;font-family:inherit;text-align:center;" onkeydown="if(event.key===\'Enter\')unlockR()"><div style="margin-top:8px;"><button class="btn btn-outline-sm btn-sm" onclick="unlockR()" style="padding:8px 24px;">验证</button></div><div id="whErr" style="font-size:12px;color:var(--red);margin-top:6px;"></div></div>';
+    m.innerHTML='<div style="background:#FFF9F0;border:1px solid #F5ECD7;border-radius:10px;padding:24px;text-align:center;margin-top:20px;"><div style="font-size:24px;margin-bottom:8px;">\U0001F512</div><div style="font-size:16px;font-weight:600;color:var(--primary);margin-bottom:12px;">修改机器人设置</div><input id="whA" placeholder="我是谁？" style="width:220px;padding:8px 12px;border:2px solid #e8e8e8;border-radius:8px;font-size:15px;outline:none;font-family:inherit;text-align:center;" onkeydown="if(event.key===\'Enter\')unlockR()"><div style="margin-top:8px;"><button class="btn btn-outline-sm btn-sm" onclick="unlockR()" style="padding:8px 24px;">验证</button></div><div id="whErr" style="font-size:12px;color:var(--red);margin-top:6px;"></div></div>';
     return;
   }
-  var items=rl.map(function(r){return '<div class="setting-card" style="flex-direction:column;align-items:stretch;gap:8px;"><div style="display:flex;justify-content:space-between;align-items:center;"><span class="name">'+r.name+'</span><span class="tag '+(r.webhook_url?'tag-on':'tag-off')+'">'+(r.webhook_url?'已配置':'未配置')+'</span></div><div class="setting-row"><input id="wh_'+r.id+'" value="'+(r.webhook_url||'').replace(/"/g,'&quot;')+'" placeholder="Webhook 地址" style="flex:1;padding:7px 10px;border:2px solid #e8e8e8;border-radius:6px;font-size:13px;outline:none;font-family:inherit;"><button class="btn btn-green-sm btn-sm" onclick="saveWH('+r.id+')">保存</button><button class="btn btn-outline-sm btn-sm" onclick="testWH('+r.id+')"'+(r.webhook_url?'':' disabled')+'>测试</button></div></div>';}).join('');
-  b.innerHTML='<div style="font-size:12px;color:var(--text-light);margin-bottom:12px;">每个区域独立配置企微机器人，每天的提醒和汇总将自动推送到对应群。</div>'+(items||'<div style="color:#999;font-size:13px;">暂无区域</div>')+'<div style="margin-top:12px;text-align:center;"><button class="btn btn-ghost-sm btn-sm" onclick="lockR()">🔒 锁定</button><button class="btn btn-outline-sm btn-sm" onclick="showSTab(\'robot\')" style="margin-left:8px;">🔄 刷新</button></div>';
+  var items=_regionList.map(function(r){return '<div class="setting-card" style="flex-direction:column;align-items:stretch;gap:8px;"><div style="display:flex;justify-content:space-between;align-items:center;"><span class="name">\U0001F4CD '+r.name+'</span><span class="tag '+(r.webhook_url?'tag-on':'tag-off')+'">'+(r.webhook_url?'已配置':'未配置')+'</span></div><div class="setting-row"><input id="wh_'+r.id+'" value="'+(r.webhook_url||'').replace(/"/g,'&quot;')+'" placeholder="Webhook 地址" style="flex:1;padding:7px 10px;border:2px solid #e8e8e8;border-radius:6px;font-size:13px;outline:none;font-family:inherit;"><button class="btn btn-green-sm btn-sm" onclick="saveWH('+r.id+')">保存</button><button class="btn btn-outline-sm btn-sm" onclick="testWH('+r.id+')"'+(r.webhook_url?'':' disabled')+'>测试</button></div></div>';}).join('');
+  m.innerHTML='<div style="font-size:12px;color:var(--text-light);margin-bottom:12px;">每个区域可独立配置企业微信群机器人，每天的提醒和汇总将自动推送到对应群。</div>'+(items||'<div style="color:#999;font-size:13px;">暂无区域</div>')+'<div style="margin-top:12px;text-align:center;"><button class="btn btn-ghost-sm btn-sm" onclick="lockR()">\U0001F512 锁定</button><button class="btn btn-ghost-sm btn-sm" onclick="loadSetting(\'robot\')" style="margin-left:8px;">\U0001F504 刷新</button></div>';
 }
 
-function unlockR(){var i=document.getElementById('whA'),e=document.getElementById('whErr');if(!i)return;if(i.value.trim()==='无敌小帅'){window._whU=true;showSTab('robot');}else{e.textContent='暗号不对哦～';}}
-function lockR(){window._whU=false;showSTab('robot');}
+function unlockR(){var i=document.getElementById('whA'),e=document.getElementById('whErr');if(!i)return;if(i.value.trim()==='无敌小帅'){window._whU=true;loadSetting('robot');}else{e.textContent='暗号不对哦～';}}
+function lockR(){window._whU=false;loadSetting('robot');}
 
-async function addR(){var i=document.getElementById('newR'),n=i.value.trim();if(!n)return toast('请输入区域名称');try{await api('/api/admin/regions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});i.value='';toast('添加成功');showSTab('regions');}catch(e){toast('添加失败：'+e.message,true);}}
-async function addS(rid){var i=document.getElementById('ns_'+rid),n=i.value.trim();if(!n)return toast('请输入门店名称');try{await api('/api/admin/stores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,region_id:rid})});i.value='';toast('添加成功');showSTab('regions');refreshStores();}catch(e){toast('添加失败：'+e.message,true);}}
-function editS(id){var s=window._sl.find(function(x){return x.id===id});if(!s)return;var nn=prompt('修改门店名称：',s.name);if(nn&&nn.trim())saveS(id,nn.trim());}
-async function saveS(id,n){try{await api('/api/admin/stores/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});toast('修改成功');showSTab('regions');refreshStores();}catch(e){toast('修改失败：'+e.message,true);}}
-async function togS(id){try{await api('/api/admin/stores/'+id+'/toggle',{method:'PUT'});toast('状态已切换');showSTab('regions');refreshStores();}catch(e){toast('操作失败：'+e.message,true);}}
-async function delS(id){var s=window._sl.find(function(x){return x.id===id});if(!s)return;if(!confirm('确定删除「'+s.name+'」吗？'))return;try{await api('/api/admin/stores/'+id,{method:'DELETE'});toast('已删除');showSTab('regions');refreshStores();}catch(e){toast('删除失败：'+e.message,true);}}
-async function addD(){var i=document.getElementById('newD'),n=i.value.trim();if(!n)return toast('请输入菜品名称');try{await api('/api/admin/dishes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});i.value='';toast('添加成功');showSTab('dishes');}catch(e){toast('添加失败：'+e.message,true);}}
-function editD(id){var d=window._dl.find(function(x){return x.id===id});if(!d)return;var nn=prompt('修改菜品名称：',d.name);if(nn&&nn.trim())saveD(id,nn.trim());}
-async function saveD(id,n){try{await api('/api/admin/dishes/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});toast('修改成功');showSTab('dishes');}catch(e){toast('修改失败：'+e.message,true);}}
-async function togD(id){try{await api('/api/admin/dishes/'+id+'/toggle',{method:'PUT'});toast('状态已切换');showSTab('dishes');}catch(e){toast('操作失败：'+e.message,true);}}
-async function delD(id){var d=window._dl.find(function(x){return x.id===id});if(!d)return;if(!confirm('确定删除「'+d.name+'」吗？'))return;try{await api('/api/admin/dishes/'+id,{method:'DELETE'});toast('已删除');showSTab('dishes');}catch(e){toast('删除失败：'+e.message,true);}}
-async function saveWH(id){var i=document.getElementById('wh_'+id);if(!i)return;var u=i.value.trim(),r=window._rl.find(function(x){return x.id===id});if(!r)return;try{await api('/api/admin/regions/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:r.name,webhook_url:u})});toast('Webhook 已保存');}catch(e){toast('保存失败：'+e.message,true);}}
+// ── 操作函数 ──
+async function addR(){var i=document.getElementById('newR'),n=i.value.trim();if(!n)return toast('请输入区域名称');try{await api('/api/admin/regions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});i.value='';toast('添加成功');loadSetting('stores');goHome();}catch(e){toast('添加失败：'+e.message,true);}}
+async function addS(rid){var i=document.getElementById('ns_'+rid),n=i.value.trim();if(!n)return toast('请输入门店名称');try{await api('/api/admin/stores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,region_id:rid})});i.value='';toast('添加成功');loadSetting('stores');refreshStores();}catch(e){toast('添加失败：'+e.message,true);}}
+function editS(id){var s=_storeList.find(function(x){return x.id===id});if(!s)return;var nn=prompt('修改门店名称：',s.name);if(nn&&nn.trim())saveS(id,nn.trim());}
+async function saveS(id,n){try{await api('/api/admin/stores/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});toast('修改成功');loadSetting('stores');refreshStores();}catch(e){toast('修改失败：'+e.message,true);}}
+async function togS(id){try{await api('/api/admin/stores/'+id+'/toggle',{method:'PUT'});toast('状态已切换');loadSetting('stores');refreshStores();}catch(e){toast('操作失败：'+e.message,true);}}
+async function delS(id){var s=_storeList.find(function(x){return x.id===id});if(!s)return;if(!confirm('确定删除「'+s.name+'」吗？'))return;try{await api('/api/admin/stores/'+id,{method:'DELETE'});toast('已删除');loadSetting('stores');refreshStores();}catch(e){toast('删除失败：'+e.message,true);}}
+async function addD(){var i=document.getElementById('newD'),n=i.value.trim();if(!n)return toast('请输入菜品名称');try{await api('/api/admin/dishes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});i.value='';toast('添加成功');loadSetting('dishes');}catch(e){toast('添加失败：'+e.message,true);}}
+function editD(id){var d=_dishList.find(function(x){return x.id===id});if(!d)return;var nn=prompt('修改菜品名称：',d.name);if(nn&&nn.trim())saveD(id,nn.trim());}
+async function saveD(id,n){try{await api('/api/admin/dishes/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});toast('修改成功');loadSetting('dishes');}catch(e){toast('修改失败：'+e.message,true);}}
+async function togD(id){try{await api('/api/admin/dishes/'+id+'/toggle',{method:'PUT'});toast('状态已切换');loadSetting('dishes');}catch(e){toast('操作失败：'+e.message,true);}}
+async function delD(id){var d=_dishList.find(function(x){return x.id===id});if(!d)return;if(!confirm('确定删除「'+d.name+'」吗？'))return;try{await api('/api/admin/dishes/'+id,{method:'DELETE'});toast('已删除');loadSetting('dishes');}catch(e){toast('删除失败：'+e.message,true);}}
+async function saveWH(id){var i=document.getElementById('wh_'+id);if(!i)return;var u=i.value.trim(),r=_regionList.find(function(x){return x.id===id});if(!r)return;try{await api('/api/admin/regions/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:r.name,webhook_url:u})});toast('Webhook 已保存');}catch(e){toast('保存失败：'+e.message,true);}}
 async function testWH(id){try{var r=await api('/api/admin/regions/'+id+'/test-webhook',{method:'POST'});toast(r.success?'✅ 测试消息发送成功！请查看企微群':'❌'+(r.error||'发送失败'));}catch(e){toast('❌'+e.message,true);}}
-async function refreshStores(){try{var r=await fetch(API+'/api/stores');stores=await r.json();renderPickers();}catch(_){}}
+async function refreshStores(){try{var r=await fetch(API+'/api/stores');stores=await r.json();}catch(_){}}
 
-init();
+goHome();
 </script>
 </body>
 </html>
