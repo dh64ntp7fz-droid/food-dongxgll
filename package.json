@@ -1,0 +1,14 @@
+{
+  "name": "food-waste-app",
+  "version": "1.0.0",
+  "description": "椁愬巺姣忔棩鑿滃搧鎶ユ崯绯荤粺",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.4",
+    "express": "^4.21.0"
+  }
+}
