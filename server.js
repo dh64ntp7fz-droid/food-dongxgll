@@ -223,12 +223,12 @@ app.get('/api/admin/dishes', (_req, res) => {
 });
 
 app.post('/api/admin/dishes', (req, res) => {
-  try { const r = db.addDish(req.body.name); res.json({ success: true, id: r.lastInsertRowid }); }
+  try { const r = db.addDish(req.body.name, req.body.dish_group); res.json({ success: true, id: r.lastInsertRowid }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.put('/api/admin/dishes/:id', (req, res) => {
-  try { db.updateDish(Number(req.params.id), req.body.name); res.json({ success: true }); }
+  try { db.updateDish(Number(req.params.id), req.body.name, req.body.dish_group); res.json({ success: true }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 

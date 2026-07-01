@@ -33,6 +33,7 @@ function initDb() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
       active INTEGER NOT NULL DEFAULT 1,
+      dish_group TEXT NOT NULL DEFAULT '通用',
       sort_order INTEGER NOT NULL DEFAULT 0
     );
     CREATE TABLE IF NOT EXISTS submissions (
@@ -47,11 +48,11 @@ function initDb() {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_store_date ON submissions(store_id, date);
   `);
 
-  // 兼容旧表：如果 stores 没有 region_id 列则加
-  const cols = db.prepare("PRAGMA table_info(stores)").all().map(c => c.name);
-  if (!cols.includes('region_id')) {
-    db.exec("ALTER TABLE stores ADD COLUMN region_id INTEGER DEFAULT 0");
-  }
+  // 兼容旧表
+  const sCols = db.prepare("PRAGMA table_info(stores)").all().map(c => c.name);
+  if (!sCols.includes('region_id')) db.exec("ALTER TABLE stores ADD COLUMN region_id INTEGER DEFAULT 0");
+  const dCols = db.prepare("PRAGMA table_info(dishes)").all().map(c => c.name);
+  if (!dCols.includes('dish_group')) db.exec("ALTER TABLE dishes ADD COLUMN dish_group TEXT NOT NULL DEFAULT '通用'");
 
   // 种子数据：区域
   const regionCount = db.prepare('SELECT COUNT(*) as cnt FROM regions').get().cnt;
@@ -85,14 +86,15 @@ function initDb() {
   // 种子数据：菜品
   const dishCount = db.prepare('SELECT COUNT(*) as cnt FROM dishes').get().cnt;
   if (dishCount === 0) {
-    const insert = db.prepare('INSERT INTO dishes (name, sort_order) VALUES (?, ?)');
-    db.transaction(() => {
-      [
-        '红烧肉', '糖醋排骨', '清蒸鲈鱼', '宫保鸡丁', '麻婆豆腐',
-        '回锅肉', '水煮鱼', '干煸四季豆', '鱼香肉丝', '西红柿炒蛋',
-        '酸辣土豆丝', '蒜蓉西兰花', '红烧茄子', '京酱肉丝', '锅包肉'
-      ].forEach((d, i) => insert.run(d, i));
-    })();
+    const insert = db.prepare('INSERT INTO dishes (name, dish_group, sort_order) VALUES (?, ?, ?)');
+    const tx = db.transaction(() => {
+      [['红烧肉','调改店'], ['糖醋排骨','非调改店'], ['清蒸鲈鱼','调改店'], ['宫保鸡丁','通用'],
+       ['麻婆豆腐','非调改店'], ['回锅肉','调改店'], ['水煮鱼','非调改店'], ['干煸四季豆','通用'],
+       ['鱼香肉丝','调改店'], ['西红柿炒蛋','通用'], ['酸辣土豆丝','非调改店'], ['蒜蓉西兰花','调改店'],
+       ['红烧茄子','非调改店'], ['京酱肉丝','调改店'], ['锅包肉','通用']
+      ].forEach((d, i) => insert.run(d[0], d[1], i));
+    });
+    tx();
   }
 
   console.log(`[DB] 数据库就绪 ${DB_PATH}`);
@@ -161,19 +163,22 @@ function deleteStore(id) {
 // ===================== Dishes =====================
 
 function getActiveDishes() {
-  return db.prepare('SELECT id, name FROM dishes WHERE active = 1 ORDER BY sort_order').all();
+  return db.prepare('SELECT id, name, dish_group FROM dishes WHERE active = 1 ORDER BY sort_order').all();
 }
 
 function getAllDishes() {
   return db.prepare('SELECT * FROM dishes ORDER BY sort_order').all();
 }
 
-function addDish(name) {
+function addDish(name, dishGroup) {
   const max = db.prepare('SELECT MAX(sort_order) as m FROM dishes').get()?.m || 0;
-  return db.prepare('INSERT INTO dishes (name, sort_order) VALUES (?, ?)').run(name, max + 1);
+  return db.prepare('INSERT INTO dishes (name, dish_group, sort_order) VALUES (?, ?, ?)').run(name, dishGroup || '通用', max + 1);
 }
 
-function updateDish(id, name) {
+function updateDish(id, name, dishGroup) {
+  if (dishGroup !== undefined) {
+    return db.prepare('UPDATE dishes SET name = ?, dish_group = ? WHERE id = ?').run(name, dishGroup, id);
+  }
   return db.prepare('UPDATE dishes SET name = ? WHERE id = ?').run(name, id);
 }
 
