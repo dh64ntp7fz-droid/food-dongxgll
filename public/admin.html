@@ -308,7 +308,7 @@ async function renderStores() {
         <button class="btn btn-red" onclick="addStore()">添加门店</button>
       </div>
       <table class="list-table">
-        <thead><tr><th>ID</th><th>名称</th><th class="wh-cell">企微Webhook</th><th>状态/th><th class="actions">鎿嶄綔</th></tr></thead>
+        <thead><tr><th>ID</th><th>名称</th><th class="wh-cell">企微Webhook</th><th>状态/th><th class="actions">操作</th></tr></thead>
         <tbody>${rows || '<tr><td colspan="5" class="empty">暂无闂ㄥ簵</td></tr>'}</tbody>
       </table>
     </div>`;
@@ -346,7 +346,7 @@ async function saveStore(id) {
       body: JSON.stringify({ name }),
     });
     toast('修改成功');
-  } catch (e) { toast('淇敼澶辫触：' + e.message); }
+  } catch (e) { toast('修改失败：' + e.message); }
   renderStores();
 }
 
@@ -373,7 +373,7 @@ async function saveWebhook(id) {
       body: JSON.stringify({ webhook_url: url }),
     });
     toast(url ? 'Webhook 已保存 : 'Webhook 已清除);
-  } catch (e) { toast('保存澶辫触：' + e.message); }
+  } catch (e) { toast('保存失败：' + e.message); }
   renderStores();
 }
 
@@ -395,7 +395,7 @@ async function toggleStore(id) {
 async function deleteStore(id, name) {
   if (!confirm(`确定要删除门店「{name}」吗？历史提交记录将保留。)) return;
   try { await api('/api/admin/stores/' + id, { method: 'DELETE' }); toast('已删除); renderStores(); }
-  catch (e) { toast('删除澶辫触：' + e.message); }
+  catch (e) { toast('删除失败：' + e.message); }
 }
 
 // ===== 菜品管理 =====
@@ -422,7 +422,7 @@ async function renderDishes() {
         <button class="btn btn-red" onclick="addDish()">添加菜品</button>
       </div>
       <table class="list-table">
-        <thead><tr><th>ID</th><th>名称</th><th>状态/th><th class="actions">鎿嶄綔</th></tr></thead>
+        <thead><tr><th>ID</th><th>名称</th><th>状态/th><th class="actions">操作</th></tr></thead>
         <tbody>${rows || '<tr><td colspan="4" class="empty">暂无菜品</td></tr>'}</tbody>
       </table>
     </div>`;
@@ -460,7 +460,7 @@ async function saveDish(id) {
       body: JSON.stringify({ name }),
     });
     toast('修改成功');
-  } catch (e) { toast('淇敼澶辫触：' + e.message); }
+  } catch (e) { toast('修改失败：' + e.message); }
   renderDishes();
 }
 
@@ -472,7 +472,7 @@ async function toggleDish(id) {
 async function deleteDish(id, name) {
   if (!confirm(`确定要删除菜品「{name}」吗？)) return;
   try { await api('/api/admin/dishes/' + id, { method: 'DELETE' }); toast('已删除); renderDishes(); }
-  catch (e) { toast('删除澶辫触：' + e.message); }
+  catch (e) { toast('删除失败：' + e.message); }
 }
 </script>
 </body>

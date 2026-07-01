@@ -237,7 +237,7 @@ async function handleSubmit() {
   submitting = true;
   const btn = document.getElementById('btnSubmit');
   btn.disabled = true;
-  btn.textContent = '鎻愪氦涓€?;
+  btn.textContent = '提交中...';
 
   try {
     const storeName = stores.find(s => s.id === selectedStoreId)?.name || '';
@@ -263,12 +263,12 @@ async function handleSubmit() {
     if (data.success) {
       renderForm(true);
     } else {
-      alert('alert('提交失败：' + (data.error || '未知错误'));
+      alert('提交失败：' + (data.error || '未知错误'));
       btn.disabled = false;
       btn.textContent = '确认提交';
     }
   } catch (e) {
-    alert('alert('网络错误：' + e.message);
+    alert('网络错误：' + e.message);
     btn.disabled = false;
     btn.textContent = '确认提交';
   }
