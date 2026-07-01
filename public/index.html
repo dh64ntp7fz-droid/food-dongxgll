@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>鑿滃搧鎶ユ崯濉姤</title>
+<title>菜品报损填报</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -98,12 +98,12 @@
 <body>
 <div class="container" id="app">
   <div class="header">
-    <h1>馃嵔锔?姣忔棩鑿滃搧鎶ユ崯</h1>
-    <p>璇蜂簬姣忔棩 20:00 鍓嶅畬鎴愬～鎶?/p>
+    <h1>🍔 每日菜品报损</h1>
+    <p>请于每日 20:00 前完成填报/p>
   </div>
   <div id="main-content"></div>
   <div class="footer">
-    鏁版嵁浠呯敤浜庡唴閮ㄧ鐞?路 璇峰瀹炲～鍐?    <br><a href="/admin.html" style="color:#999;text-decoration:none;font-size:11px;">馃敡 绠＄悊鍏ュ彛</a>
+    数据仅用于内部管理 · 请如实填报    <br><a href="/admin.html" style="color:#999;text-decoration:none;font-size:11px;">🔑 管理入口</a>
   </div>
 </div>
 
@@ -118,11 +118,11 @@ let selectedStoreId = null;
 let alreadySubmitted = false;
 let submitting = false;
 
-// ============== 鍒濆鍖?==============
+// ============== 初始化==============
 
 async function init() {
   const main = document.getElementById('main-content');
-  main.innerHTML = '<div class="loading">鍔犺浇涓€?/div>';
+  main.innerHTML = '<div class="loading">加载中...</div>';
 
   try {
     const [sRes, dRes] = await Promise.all([
@@ -133,18 +133,18 @@ async function init() {
     dishes = await dRes.json();
 
     if (stores.length === 0) {
-      main.innerHTML = '<div class="error-box">鏆傛棤鍙€夐棬搴楋紝璇疯仈绯荤鐞嗗憳閰嶇疆銆?/div>';
+      main.innerHTML = '<div class="error-box">暂无可选门店，请联系管理员配置。</div>';
       return;
     }
     if (dishes.length === 0) {
-      main.innerHTML = '<div class="error-box">鏆傛棤寰呭～鎶ヨ彍鍝侊紝璇疯仈绯荤鐞嗗憳閰嶇疆銆?/div>';
+      main.innerHTML = '<div class="error-box">暂无待填报菜品，请联系管理员配置。</div>';
       return;
     }
 
     dishes.forEach(d => { quantities[d.id] = 0; });
     renderForm();
   } catch (e) {
-    main.innerHTML = `<div class="error-box">鍔犺浇澶辫触锛?{e.message}<br>璇锋鏌ョ綉缁滃悗鍒锋柊椤甸潰</div>`;
+    main.innerHTML = `<div class="error-box">加载失败：${e.message}<br>请检查网络后刷新页面</div>`;
   }
 }
 
@@ -156,10 +156,10 @@ function renderForm(showAlready = false) {
   if (showAlready && selectedStoreId) {
     main.innerHTML = `
       <div class="already-submitted">
-        <div class="icon">鉁?/div>
-        <h2>浠婃棩宸插～鎶ワ紝璋㈣阿</h2>
-        <p>闂ㄥ簵銆?{stores.find(s => s.id === selectedStoreId)?.name || ''}銆嶄粖鏃ョ殑鎶ユ崯鏁版嵁宸叉彁浜?/p>
-        <p style="margin-top:16px;font-size:13px;">濡傞渶淇敼璇疯仈绯荤鐞嗗憳</p>
+        <div class="icon">✅/div>
+        <h2>今日已填报，谢谢</h2>
+        <p>门店「${stores.find(s => s.id === selectedStoreId)?.name || ''}」今日的报损数据已提交</p>
+        <p style="margin-top:16px;font-size:13px;">如需修改请联系管理员</p>
       </div>`;
     return;
   }
@@ -172,7 +172,7 @@ function renderForm(showAlready = false) {
     <div class="dish-item">
       <span class="dish-name">${d.name}</span>
       <div class="dish-input">
-        <button onclick="changeQty(${d.id}, -1)">鈭?/button>
+        <button onclick="changeQty(${d.id}, -1)">−/button>
         <input type="number" id="qty_${d.id}" value="${quantities[d.id]}" min="0"
           onchange="onQtyChange(${d.id}, this.value)"
           onfocus="this.select()">
@@ -184,23 +184,23 @@ function renderForm(showAlready = false) {
   main.innerHTML = `
     <div class="content">
       <div class="form-group">
-        <label>閫夋嫨闂ㄥ簵</label>
+        <label>选择门店</label>
         <select id="storeSelect" onchange="onStoreChange(this.value)">
-          <option value="">-- 璇烽€夋嫨闂ㄥ簵 --</option>
+          <option value="">-- 请选择门店 --</option>
           ${storeOpts}
         </select>
       </div>
       <div class="form-group">
-        <label>鑿滃搧鍓╀綑鏁伴噺锛堝墿浣欐暟閲?= 褰撳ぉ鍗栧墿涓嬬殑 / 鏃犳硶闅斿淇濆瓨鐨勶級</label>
+        <label>菜品剩余数量（剩余数量 = 当天卖剩下的 / 无法隔夜保存的）</label>
       </div>
       <div class="dish-list">${dishItems}</div>
       <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()" ${!selectedStoreId ? 'disabled' : ''}>
-        纭鎻愪氦
+        确认提交
       </button>
     </div>`;
 }
 
-// ============== 浜嬩欢澶勭悊 ==============
+// ============== 事件处理 ==============
 
 async function onStoreChange(storeId) {
   selectedStoreId = storeId ? Number(storeId) : null;
@@ -208,7 +208,7 @@ async function onStoreChange(storeId) {
 
   if (!selectedStoreId) return;
 
-  // 妫€鏌ユ槸鍚﹀凡鎻愪氦
+  // 检查是否已提交
   try {
     const res = await fetch(API + `/api/check-submission?storeId=${selectedStoreId}&date=${TODAY}`);
     const { submitted } = await res.json();
@@ -263,14 +263,14 @@ async function handleSubmit() {
     if (data.success) {
       renderForm(true);
     } else {
-      alert('鎻愪氦澶辫触锛? + (data.error || '鏈煡閿欒'));
+      alert('alert('提交失败：' + (data.error || '未知错误'));
       btn.disabled = false;
-      btn.textContent = '纭鎻愪氦';
+      btn.textContent = '确认提交';
     }
   } catch (e) {
-    alert('缃戠粶閿欒锛? + e.message);
+    alert('alert('网络错误：' + e.message);
     btn.disabled = false;
-    btn.textContent = '纭鎻愪氦';
+    btn.textContent = '确认提交';
   }
   submitting = false;
 }

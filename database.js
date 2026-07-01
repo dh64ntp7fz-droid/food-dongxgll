@@ -4,13 +4,13 @@ const fs = require('fs');
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data', 'food-waste.db');
 
-// 纭繚 data 鐩綍瀛樺湪
+// 确保 data 目录存在
 const dataDir = path.dirname(DB_PATH);
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 let db;
 
-// ===================== 鍒濆鍖?=====================
+// ===================== 初始化=====================
 
 function initDb() {
   db = new Database(DB_PATH);
@@ -43,13 +43,13 @@ function initDb() {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_store_date ON submissions(store_id, date);
   `);
 
-  // 绉嶅瓙鏁版嵁锛氬彧鍦ㄧ┖琛ㄦ椂鎻掑叆锛堥伩鍏嶈鐩栫敤鎴锋暟鎹級
+  // 种子数据：只在空表时插入（避免覆盖用户数据）
   const storeCount = db.prepare('SELECT COUNT(*) as cnt FROM stores').get().cnt;
   if (storeCount === 0) {
     const insertStore = db.prepare('INSERT INTO stores (name, sort_order, webhook_url) VALUES (?, ?, ?)');
     const stores = [
-      '缁垮矝鑺卞洯搴?, '鐭冲博涓诲満搴?, '澶ф湕鐘€鐗涘潯搴?, '妯矖搴?,
-      '缁胯嵎/鑲插効搴?, '绉戣嫅搴?, '浣撹偛棣嗗簵'
+      '绿岛花园店', '石岩主场店', '大朗/牛陂店', '横岗店',
+      '绿荷/育儿店', '科茗店', '体育馆店'
     ];
     const tx = db.transaction(() => {
       stores.forEach((s, i) => insertStore.run(s, i, ''));
@@ -61,9 +61,9 @@ function initDb() {
   if (dishCount === 0) {
     const insertDish = db.prepare('INSERT INTO dishes (name, sort_order) VALUES (?, ?)');
     const dishes = [
-      '绾㈢儳鑲?,'绯栭唻鎺掗','娓呰捀椴堥奔','瀹繚楦′竵','楹诲﹩璞嗚厫',
-      '鍥為攨鑲?,'姘寸叜楸?,'骞茬吀鍥涘璞?,'楸奸鑲変笣','瑗跨孩鏌跨倰铔?,
-      '閰歌荆鍦熻眴涓?,'钂滆搲瑗垮叞鑺?,'绾㈢儳鑼勫瓙','浜叡鑲変笣','閿呭寘鑲?
+      '红烧肉', '糖醋排骨', '清蒸鲈鱼', '宫保鸡丁', '麻婆豆腐',
+      '回锅肉', '水煮鱼', '干煸四季豆', '鱼香肉丝', '西红柿炒蛋',
+      '酸辣土豆丝', '蒜蓉西兰花', '红烧茄子', '京酱肉丝', '锅包肉'
     ];
     const tx = db.transaction(() => {
       dishes.forEach((d, i) => insertDish.run(d, i));
@@ -71,7 +71,7 @@ function initDb() {
     tx();
   }
 
-  console.log(`[DB] 鏁版嵁搴撳氨缁? ${DB_PATH}`);
+  console.log(`[DB] 数据库就绪 ${DB_PATH}`);
   return db;
 }
 

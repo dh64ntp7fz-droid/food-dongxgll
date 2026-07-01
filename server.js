@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const db = require('./database');
 
-// 鍔犺浇 .env
+// 加载 .env
 const envPath = path.join(__dirname, '.env');
 if (fs.existsSync(envPath)) {
   fs.readFileSync(envPath, 'utf-8').split('\n').forEach(line => {
@@ -22,13 +22,13 @@ const app = express();
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ================== 绠＄悊鍚庡彴璁よ瘉 ==================
+// ================== 管理后台认证 ==================
 function adminAuth(req, res, next) {
   if (req.headers['x-admin-token'] === ADMIN_PASSWORD) return next();
-  return res.status(401).json({ error: '鏈巿鏉冿紝璇峰厛鐧诲綍' });
+  return res.status(401).json({ error: '未授权，请先登录' });
 }
 
-// ================== 鍘ㄥ笀闀跨 API ==================
+// ================== 厨师长端 API ==================
 
 app.get('/api/stores', (_req, res) => {
   try { res.json(db.getActiveStores()); } catch (e) { res.status(500).json({ error: e.message }); }
@@ -49,23 +49,23 @@ app.post('/api/submit', (req, res) => {
   try {
     const { storeId, storeName, date, items, submitTime } = req.body;
     if (!storeId || !date || !items || items.length === 0) {
-      return res.status(400).json({ error: '缂哄皯蹇呰鍙傛暟锛歴toreId, date, items' });
+      return res.status(400).json({ error: '缺少必要参数：storeId, date, items' });
     }
     db.submitReport(storeId, storeName, date, JSON.stringify(items), submitTime);
-    res.json({ success: true, message: '鎻愪氦鎴愬姛锛? });
+    res.json({ success: true, message: '提交成功！' });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ================== 绠＄悊鍚庡彴 API ==================
+// ================== 管理后台 API ==================
 
 app.post('/api/admin/login', (req, res) => {
   if (req.body.password === ADMIN_PASSWORD) return res.json({ success: true, token: ADMIN_PASSWORD });
-  return res.status(401).json({ error: '瀵嗙爜閿欒' });
+  return res.status(401).json({ error: '密码错误' });
 });
 
 app.post('/api/admin/verify', adminAuth, (_req, res) => res.json({ success: true }));
 
-// --- 闂ㄥ簵绠＄悊 ---
+// --- 门店管理 ---
 app.get('/api/admin/stores', adminAuth, (_req, res) => {
   try { res.json(db.getAllStores()); } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -101,13 +101,13 @@ app.post('/api/admin/stores/:id/test-webhook', adminAuth, (req, res) => {
   try {
     const stores = db.getAllStores();
     const store = stores.find(s => s.id === Number(req.params.id));
-    if (!store || !store.webhook_url) return res.status(400).json({ error: '璇ラ棬搴楁湭閰嶇疆 Webhook 鍦板潃' });
+    if (!store || !store.webhook_url) return res.status(400).json({ error: '该门店未配置 Webhook 地址' });
 
     const https = require('https');
     const url = new URL(store.webhook_url);
     const payload = JSON.stringify({
       msgtype: 'text',
-      text: { content: `馃И 娴嬭瘯娑堟伅\n闂ㄥ簵锛?{store.name}\n鑿滃搧鎶ユ崯绯荤粺 Webhook 閰嶇疆姝ｅ父锛乣 }
+      text: { content: '** 测试消息\n门店：' + store.name + '\n菜品报损系统 Webhook 配置正常！' }
     });
 
     const opts = {
@@ -123,7 +123,7 @@ app.post('/api/admin/stores/:id/test-webhook', adminAuth, (req, res) => {
       hres.on('end', () => {
         try {
           const r = JSON.parse(body);
-          if (r.errcode === 0) res.json({ success: true, message: '鍙戦€佹垚鍔? });
+          if (r.errcode === 0) res.json({ success: true, message: '发送成功' });
           else res.json({ success: false, error: r.errmsg || body });
         } catch (_) { res.json({ success: false, error: body }); }
       });
@@ -134,7 +134,7 @@ app.post('/api/admin/stores/:id/test-webhook', adminAuth, (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// --- 鑿滃搧绠＄悊 ---
+// --- 菜品管理 ---
 app.get('/api/admin/dishes', adminAuth, (_req, res) => {
   try { res.json(db.getAllDishes()); } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -159,7 +159,7 @@ app.delete('/api/admin/dishes/:id', adminAuth, (req, res) => {
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// --- 浠婃棩姹囨€?---
+// --- 今日汇总---
 app.get('/api/admin/summary', adminAuth, (req, res) => {
   try {
     const date = req.query.date || new Date().toISOString().split('T')[0];
@@ -174,22 +174,22 @@ app.get('/api/admin/report-text', adminAuth, (req, res) => {
     const d = new Date(date + 'T00:00:00+08:00');
     const month = d.getMonth() + 1, day = d.getDate();
 
-    let text = `馃搵 浠婃棩鑿滃搧鎶ユ崯姹囨€伙紙${month}鏈?{day}鏃ワ級\n`;
-    text += `鈹佲攣鈹佲攣鈹佲攣鈹佲攣鈹佲攣鈹佲攣鈹佲攣鈹佲攣鈹佲攣\n`;
-    text += `鉁?宸叉彁浜わ紙${summary.submitted.length}瀹讹級锛歚;
-    text += summary.submitted.length > 0 ? summary.submitted.map(s => s.store_name).join('銆?) : '鏃?;
-    text += `\n鉂?鏈彁浜わ紙${summary.notSubmitted.length}瀹讹級锛歚;
-    text += summary.notSubmitted.length > 0 ? summary.notSubmitted.map(s => s.name).join('銆?) : '鏃?;
-    if (summary.notSubmitted.length > 0) text += '锛堣灏藉揩琛ヤ氦锛?;
+    let text = `=== 今日菜品报损汇总（${month}月${day}日）\n`;
+    text += `────────────────────\n`;
+    text += `✅ 已提交（${summary.submitted.length}家）：`;
+    text += summary.submitted.length > 0 ? summary.submitted.map(s => s.store_name).join('、') : '无';
+    text += `\n❌ 未提交（${summary.notSubmitted.length}家）：`;
+    text += summary.notSubmitted.length > 0 ? summary.notSubmitted.map(s => s.name).join('、') : '无';
+    if (summary.notSubmitted.length > 0) text += '（请尽快补交）';
 
     res.json({ text });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// --- 瀹氭椂鎻愰啋妫€鏌ワ紙缁欏閮?cron 鏈嶅姟璋冪敤锛?---
+// --- 定时提醒检查（给外部 cron 服务调用）---
 app.get('/api/cron/check-reminder', (req, res) => {
   try {
-    if (req.query.token !== ADMIN_PASSWORD) return res.status(401).json({ error: 'token 閿欒' });
+    if (req.query.token !== ADMIN_PASSWORD) return res.status(401).json({ error: 'token 错误' });
     const date = new Date().toISOString().split('T')[0];
     const summary = db.getTodaySummary(date);
     res.json({
@@ -203,15 +203,15 @@ app.get('/api/cron/check-reminder', (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ================== 鍚姩 ==================
+// ================== 启动 ==================
 
 db.initDb();
 app.listen(PORT, () => {
   console.log('========================================');
-  console.log('  馃嵔  椁愬巺姣忔棩鑿滃搧鎶ユ崯绯荤粺');
+  console.log('  餐厅每日菜品报损系统');
   console.log('========================================');
-  console.log(`  濉姤椤甸潰 : http://localhost:${PORT}/`);
-  console.log(`  绠＄悊鍚庡彴 : http://localhost:${PORT}/admin.html`);
-  console.log(`  绠＄悊瀵嗙爜 : ${ADMIN_PASSWORD}`);
+  console.log(`  填报页面 : http://localhost:${PORT}/`);
+  console.log(`  管理后台 : http://localhost:${PORT}/admin.html`);
+  console.log(`  管理密码 : ${ADMIN_PASSWORD}`);
   console.log('========================================');
 });

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>鍚庡彴绠＄悊 路 鑿滃搧鎶ユ崯</title>
+<title>后台管理 · 菜品报损</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -139,23 +139,23 @@
 <div id="app">
   <div class="login-wrap" id="loginPage">
     <div class="login-box">
-      <h2>馃敡 鍚庡彴绠＄悊</h2>
-      <div class="sub">鑿滃搧鎶ユ崯绯荤粺 路 绠＄悊鑰呭叆鍙?/div>
-      <input type="password" id="pwdInput" placeholder="璇疯緭鍏ョ鐞嗗瘑鐮? onkeydown="if(event.key==='Enter')doLogin()">
-      <button onclick="doLogin()">鐧?褰?/button>
+      <h2>🔑 后台管理</h2>
+      <div class="sub">菜品报损系统 · 管理者入口/div>
+      <input type="password" id="pwdInput" placeholder="请输入管理密码 onkeydown="if(event.key==='Enter')doLogin()">
+      <button onclick="doLogin()">登 录/button>
       <div class="err" id="loginErr"></div>
     </div>
   </div>
 
   <div class="admin-wrap" id="adminPage">
     <div class="topbar">
-      <h1>馃敡 鑿滃搧鎶ユ崯 路 鍚庡彴绠＄悊</h1>
-      <span class="logout" onclick="doLogout()">閫€鍑虹櫥褰?/span>
+      <h1>🔑 菜品报损 · 后台管理</h1>
+      <span class="logout" onclick="doLogout()">退出登录/span>
     </div>
     <div class="tabs">
-      <div class="tab active" data-tab="summary" onclick="switchTab('summary')">馃搳 浠婃棩姹囨€?/div>
-      <div class="tab" data-tab="stores" onclick="switchTab('stores')">馃彧 闂ㄥ簵 & 浼佸井鏈哄櫒浜?/div>
-      <div class="tab" data-tab="dishes" onclick="switchTab('dishes')">馃嵆 鑿滃搧绠＄悊</div>
+      <div class="tab active" data-tab="summary" onclick="switchTab('summary')">📊 今日汇总/div>
+      <div class="tab" data-tab="stores" onclick="switchTab('stores')">🏪 门店 & 企微机器人/div>
+      <div class="tab" data-tab="dishes" onclick="switchTab('dishes')">🍆 菜品管理</div>
     </div>
     <div class="panel" id="tabContent"></div>
   </div>
@@ -178,13 +178,13 @@ async function api(url, opts = {}) {
   const headers = { ...opts.headers };
   if (TOKEN) headers['x-admin-token'] = TOKEN;
   const res = await fetch(API + url, { ...opts, headers });
-  if (res.status === 401) { doLogout(); throw new Error('鐧诲綍宸茶繃鏈?); }
+  if (res.status === 401) { doLogout(); throw new Error('登录已过期); }
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || '璇锋眰澶辫触');
+  if (!res.ok) throw new Error(data.error || '请求失败');
   return data;
 }
 
-// ===== 鐧诲綍/鐧诲嚭 =====
+// ===== 登录/登出 =====
 async function doLogin() {
   const pwd = document.getElementById('pwdInput').value;
   const err = document.getElementById('loginErr');
@@ -201,8 +201,8 @@ async function doLogin() {
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('adminPage').style.display = 'block';
       switchTab('summary');
-    } else { err.textContent = '瀵嗙爜閿欒'; }
-  } catch (e) { err.textContent = '鐧诲綍澶辫触锛? + e.message; }
+    } else { err.textContent = '密码错误'; }
+  } catch (e) { err.textContent = '登录失败：' + e.message; }
 }
 
 function doLogout() {
@@ -227,13 +227,13 @@ if (TOKEN) {
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
-  document.getElementById('tabContent').innerHTML = '<div class="loading">鍔犺浇涓€?/div>';
+  document.getElementById('tabContent').innerHTML = '<div class="loading">加载中.../div>';
   if (name === 'summary') renderSummary();
   else if (name === 'stores') renderStores();
   else if (name === 'dishes') renderDishes();
 }
 
-// ===== 姹囨€?=====
+// ===== 汇总=====
 async function renderSummary() {
   const c = document.getElementById('tabContent');
   try {
@@ -241,41 +241,41 @@ async function renderSummary() {
     const s = await api('/api/admin/summary?date=' + today);
 
     const subTags = s.submitted.length
-      ? s.submitted.map(x => `<span class="store-tag ok">鉁?${x.store_name}<br><small style="opacity:0.7">${x.submit_time}</small></span>`).join('')
-      : '<div style="color:#999;font-size:13px">鏆傛棤</div>';
+      ? s.submitted.map(x => `<span class="store-tag ok">✅${x.store_name}<br><small style="opacity:0.7">${x.submit_time}</small></span>`).join('')
+      : '<div style="color:#999;font-size:13px">暂无</div>';
 
     const missTags = s.notSubmitted.length
-      ? s.notSubmitted.map(x => `<span class="store-tag miss">鉂?${x.name}</span>`).join('')
-      : '<div style="color:#27ae60;font-size:13px">鍏ㄩ儴宸叉彁浜?馃帀</div>';
+      ? s.notSubmitted.map(x => `<span class="store-tag miss">❌${x.name}</span>`).join('')
+      : '<div style="color:#27ae60;font-size:13px">全部已提交🎉</div>';
 
     let rt = '';
     try { rt = (await api('/api/admin/report-text?date=' + today)).text; } catch (_) {}
 
     c.innerHTML = `<div class="summary-grid">
-      <div class="summary-card"><h3>鉁?宸叉彁浜ら棬搴楋紙${s.submitted.length}/${s.allStores.length}锛?/h3>${subTags}</div>
+      <div class="summary-card"><h3>✅ 已提交门店（${s.submitted.length}/${s.allStores.length}）</h3>${subTags}</div>
       <div class="summary-card" style="${s.notSubmitted.length?'border:2px solid #e74c3c':''}">
-        <h3 style="${s.notSubmitted.length?'color:#e74c3c':''}">鉂?鏈彁浜ら棬搴楋紙${s.notSubmitted.length}锛?/h3>${missTags}
+        <h3 style="${s.notSubmitted.length?'color:#e74c3c':''}">❌未提交门店（${s.notSubmitted.length}）</h3>${missTags}
       </div>
     </div>
     <div class="report-box">
-      <h3>馃搵 浼佷笟寰俊缇ゅ彂鏂囨锛堝彲鐩存帴澶嶅埗绮樿创锛?/h3>
+      <h3>📋 企业微信群发文案（可直接复制粘贴）/h3>
       <div class="report-text">${rt}</div>
-      <button class="btn btn-red btn-copy" onclick="copyReport()">馃搵 涓€閿鍒?/button>
+      <button class="btn btn-red btn-copy" onclick="copyReport()">🍵 一键复制/button>
     </div>`;
     window._rt = rt;
-  } catch (e) { c.innerHTML = `<div class="card"><div class="empty">鍔犺浇澶辫触锛?{e.message}</div></div>`; }
+  } catch (e) { c.innerHTML = `<div class="card"><div class="empty">加载失败：{e.message}</div></div>`; }
 }
 
 function copyReport() {
   if (!window._rt) return;
-  navigator.clipboard.writeText(window._rt).then(() => toast('宸插鍒?), () => {
+  navigator.clipboard.writeText(window._rt).then(() => toast('已复制), () => {
     const ta = document.createElement('textarea'); ta.value = window._rt;
     document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    toast('宸插鍒?);
+    toast('已复制);
   });
 }
 
-// ===== 闂ㄥ簵绠＄悊锛堝惈 Webhook锛?====
+// ===== 门店管理（含 Webhook）====
 async function renderStores() {
   const c = document.getElementById('tabContent');
   try {
@@ -286,47 +286,47 @@ async function renderStores() {
         <td>${s.id}</td>
         <td id="sn-${s.id}">${s.name}</td>
         <td class="wh-cell" id="sw-${s.id}">
-          ${wh ? `<span class="wh-url" title="${wh}">${wh}</span>` : '<span class="wh-none">鏈厤缃?/span>'}
+          ${wh ? `<span class="wh-url" title="${wh}">${wh}</span>` : '<span class="wh-none">未配置/span>'}
         </td>
-        <td><span class="tag ${s.active?'tag-on':'tag-off'}">${s.active?'鍚敤':'鍋滅敤'}</span></td>
+        <td><span class="tag ${s.active?'tag-on':'tag-off'}">${s.active?'启用':'停用'}</span></td>
         <td class="actions">
-          <button class="btn btn-outline btn-sm" onclick="editStore(${s.id},'${s.name.replace(/'/g,"\\'")}')">缂栬緫</button>
-          <button class="btn btn-outline btn-sm" onclick="editWebhook(${s.id},'${(wh||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">馃Webhook</button>
-          <button class="btn btn-outline btn-sm" onclick="testWebhook(${s.id})" ${wh?'':'disabled'}>娴嬭瘯</button>
-          <button class="btn btn-outline btn-sm" onclick="toggleStore(${s.id})">${s.active?'鍋滅敤':'鍚敤'}</button>
-          <button class="btn btn-ghost btn-sm" onclick="deleteStore(${s.id},'${s.name.replace(/'/g,"\\'")}')">鍒犻櫎</button>
+          <button class="btn btn-outline btn-sm" onclick="editStore(${s.id},'${s.name.replace(/'/g,"\\'")}')">编辑</button>
+          <button class="btn btn-outline btn-sm" onclick="editWebhook(${s.id},'${(wh||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">🔗Webhook</button>
+          <button class="btn btn-outline btn-sm" onclick="testWebhook(${s.id})" ${wh?'':'disabled'}>测试</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleStore(${s.id})">${s.active?'停用':'启用'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteStore(${s.id},'${s.name.replace(/'/g,"\\'")}')">删除</button>
         </td>
       </tr>`;
     }).join('');
 
     c.innerHTML = `<div class="card">
-      <h3>馃彧 闂ㄥ簵鍒楄〃 & 浼佷笟寰俊鏈哄櫒浜?/h3>
+      <h3>🏪 门店列表 & 企业微信机器人</h3>
       <p style="font-size:12px;color:#999;margin-bottom:12px;">
-        姣忓簵鍙厤缃竴涓紒寰満鍣ㄤ汉 Webhook 鍦板潃銆傞厤缃悗锛屾眹鎬婚€氱煡鍙嚜鍔ㄦ帹閫佸埌瀵瑰簲闂ㄥ簵缇ゃ€?      </p>
+        每店可配置一个企微机器人 Webhook 地址。配置后，汇总通知可自动推送到对应门店群。      </p>
       <div class="add-row">
-        <input id="newStoreName" placeholder="杈撳叆鏂伴棬搴楀悕绉? onkeydown="if(event.key==='Enter')addStore()">
-        <button class="btn btn-red" onclick="addStore()">娣诲姞闂ㄥ簵</button>
+        <input id="newStoreName" placeholder="输入新门店名称 onkeydown="if(event.key==='Enter')addStore()">
+        <button class="btn btn-red" onclick="addStore()">添加门店</button>
       </div>
       <table class="list-table">
-        <thead><tr><th>ID</th><th>鍚嶇О</th><th class="wh-cell">浼佸井Webhook</th><th>鐘舵€?/th><th class="actions">鎿嶄綔</th></tr></thead>
-        <tbody>${rows || '<tr><td colspan="5" class="empty">鏆傛棤闂ㄥ簵</td></tr>'}</tbody>
+        <thead><tr><th>ID</th><th>名称</th><th class="wh-cell">企微Webhook</th><th>状态/th><th class="actions">鎿嶄綔</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="5" class="empty">暂无闂ㄥ簵</td></tr>'}</tbody>
       </table>
     </div>`;
     window._stores = stores;
-  } catch (e) { c.innerHTML = `<div class="card"><div class="empty">鍔犺浇澶辫触锛?{e.message}</div></div>`; }
+  } catch (e) { c.innerHTML = `<div class="card"><div class="empty">加载失败：{e.message}</div></div>`; }
 }
 
 async function addStore() {
   const inp = document.getElementById('newStoreName');
   const name = inp.value.trim();
-  if (!name) return toast('璇疯緭鍏ラ棬搴楀悕绉?);
+  if (!name) return toast('请输入门店名称);
   try {
     await api('/api/admin/stores', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
-    inp.value = ''; toast('娣诲姞鎴愬姛'); renderStores();
-  } catch (e) { toast('娣诲姞澶辫触锛? + e.message); }
+    inp.value = ''; toast('添加成功'); renderStores();
+  } catch (e) { toast('添加失败：' + e.message); }
 }
 
 function editStore(id, oldName) {
@@ -345,8 +345,8 @@ async function saveStore(id) {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
-    toast('淇敼鎴愬姛');
-  } catch (e) { toast('淇敼澶辫触锛? + e.message); }
+    toast('修改成功');
+  } catch (e) { toast('淇敼澶辫触：' + e.message); }
   renderStores();
 }
 
@@ -356,8 +356,8 @@ function editWebhook(id, oldUrl) {
   cell.innerHTML = `<div class="edit-inline">
     <input id="ewi" value="${oldUrl}" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." onkeydown="if(event.key==='Enter')saveWebhook(${id})">
     <div style="margin-top:4px;display:flex;gap:6px;">
-      <button class="btn btn-green btn-sm" onclick="saveWebhook(${id})">淇濆瓨</button>
-      <button class="btn btn-ghost btn-sm" onclick="renderStores()">鍙栨秷</button>
+      <button class="btn btn-green btn-sm" onclick="saveWebhook(${id})">保存</button>
+      <button class="btn btn-ghost btn-sm" onclick="renderStores()">取消</button>
     </div>
   </div>`;
   setTimeout(() => document.getElementById('ewi')?.focus(), 50);
@@ -372,33 +372,33 @@ async function saveWebhook(id) {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ webhook_url: url }),
     });
-    toast(url ? 'Webhook 宸蹭繚瀛? : 'Webhook 宸叉竻闄?);
-  } catch (e) { toast('淇濆瓨澶辫触锛? + e.message); }
+    toast(url ? 'Webhook 已保存 : 'Webhook 已清除);
+  } catch (e) { toast('保存澶辫触：' + e.message); }
   renderStores();
 }
 
 async function testWebhook(id) {
   const btn = event.target;
-  btn.disabled = true; btn.textContent = '鍙戦€佷腑鈥?;
+  btn.disabled = true; btn.textContent = '发送中...;
   try {
     const r = await api('/api/admin/stores/' + id + '/test-webhook', { method: 'POST' });
-    toast(r.success ? '鉁?娴嬭瘯娑堟伅鍙戦€佹垚鍔燂紒璇锋煡鐪嬩紒寰兢' : '鉂?' + (r.error || '鍙戦€佸け璐?));
-  } catch (e) { toast('鉂?' + e.message); }
-  btn.disabled = false; btn.textContent = '娴嬭瘯';
+    toast(r.success ? '✅测试消息发送成功！请查看企微群' : '❌' + (r.error || '发送失败));
+  } catch (e) { toast('❌' + e.message); }
+  btn.disabled = false; btn.textContent = '测试';
 }
 
 async function toggleStore(id) {
-  try { await api('/api/admin/stores/' + id + '/toggle', { method: 'PUT' }); toast('鐘舵€佸凡鍒囨崲'); renderStores(); }
-  catch (e) { toast('鎿嶄綔澶辫触锛? + e.message); }
+  try { await api('/api/admin/stores/' + id + '/toggle', { method: 'PUT' }); toast('状态已切换'); renderStores(); }
+  catch (e) { toast('操作失败：' + e.message); }
 }
 
 async function deleteStore(id, name) {
-  if (!confirm(`纭畾瑕佸垹闄ら棬搴椼€?{name}銆嶅悧锛熷巻鍙叉彁浜よ褰曞皢淇濈暀銆俙)) return;
-  try { await api('/api/admin/stores/' + id, { method: 'DELETE' }); toast('宸插垹闄?); renderStores(); }
-  catch (e) { toast('鍒犻櫎澶辫触锛? + e.message); }
+  if (!confirm(`确定要删除门店「{name}」吗？历史提交记录将保留。)) return;
+  try { await api('/api/admin/stores/' + id, { method: 'DELETE' }); toast('已删除); renderStores(); }
+  catch (e) { toast('删除澶辫触：' + e.message); }
 }
 
-// ===== 鑿滃搧绠＄悊 =====
+// ===== 菜品管理 =====
 async function renderDishes() {
   const c = document.getElementById('tabContent');
   try {
@@ -406,41 +406,41 @@ async function renderDishes() {
     const rows = dishes.map(d => `<tr>
       <td>${d.id}</td>
       <td id="dn-${d.id}">${d.name}</td>
-      <td><span class="tag ${d.active?'tag-on':'tag-off'}">${d.active?'鍚敤':'鍋滅敤'}</span></td>
+      <td><span class="tag ${d.active?'tag-on':'tag-off'}">${d.active?'启用':'停用'}</span></td>
       <td class="actions">
-        <button class="btn btn-outline btn-sm" onclick="editDish(${d.id},'${d.name.replace(/'/g,"\\'")}')">缂栬緫</button>
-        <button class="btn btn-outline btn-sm" onclick="toggleDish(${d.id})">${d.active?'鍋滅敤':'鍚敤'}</button>
-        <button class="btn btn-ghost btn-sm" onclick="deleteDish(${d.id},'${d.name.replace(/'/g,"\\'")}')">鍒犻櫎</button>
+        <button class="btn btn-outline btn-sm" onclick="editDish(${d.id},'${d.name.replace(/'/g,"\\'")}')">编辑</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleDish(${d.id})">${d.active?'停用':'启用'}</button>
+        <button class="btn btn-ghost btn-sm" onclick="deleteDish(${d.id},'${d.name.replace(/'/g,"\\'")}')">删除</button>
       </td>
     </tr>`).join('');
 
     c.innerHTML = `<div class="card">
-      <h3>馃嵆 鑿滃搧鍒楄〃</h3>
-      <p style="font-size:12px;color:#999;margin-bottom:12px;">鍋滅敤鐨勮彍鍝佸湪鍘ㄥ笀闀垮～鎶ョ涓嶄細鏄剧ず锛屽巻鍙叉暟鎹繚鐣欍€?/p>
+      <h3>🍆 菜品列表</h3>
+      <p style="font-size:12px;color:#999;margin-bottom:12px;">停用的菜品在厨师长填报端不会显示，历史数据保留。/p>
       <div class="add-row">
-        <input id="newDishName" placeholder="杈撳叆鏂拌彍鍝佸悕绉? onkeydown="if(event.key==='Enter')addDish()">
-        <button class="btn btn-red" onclick="addDish()">娣诲姞鑿滃搧</button>
+        <input id="newDishName" placeholder="输入新菜品名称 onkeydown="if(event.key==='Enter')addDish()">
+        <button class="btn btn-red" onclick="addDish()">添加菜品</button>
       </div>
       <table class="list-table">
-        <thead><tr><th>ID</th><th>鍚嶇О</th><th>鐘舵€?/th><th class="actions">鎿嶄綔</th></tr></thead>
-        <tbody>${rows || '<tr><td colspan="4" class="empty">鏆傛棤鑿滃搧</td></tr>'}</tbody>
+        <thead><tr><th>ID</th><th>名称</th><th>状态/th><th class="actions">鎿嶄綔</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="4" class="empty">暂无菜品</td></tr>'}</tbody>
       </table>
     </div>`;
     window._dishes = dishes;
-  } catch (e) { c.innerHTML = `<div class="card"><div class="empty">鍔犺浇澶辫触锛?{e.message}</div></div>`; }
+  } catch (e) { c.innerHTML = `<div class="card"><div class="empty">加载失败：{e.message}</div></div>`; }
 }
 
 async function addDish() {
   const inp = document.getElementById('newDishName');
   const name = inp.value.trim();
-  if (!name) return toast('璇疯緭鍏ヨ彍鍝佸悕绉?);
+  if (!name) return toast('请输入菜品名称);
   try {
     await api('/api/admin/dishes', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
-    inp.value = ''; toast('娣诲姞鎴愬姛'); renderDishes();
-  } catch (e) { toast('娣诲姞澶辫触锛? + e.message); }
+    inp.value = ''; toast('添加成功'); renderDishes();
+  } catch (e) { toast('添加失败：' + e.message); }
 }
 
 function editDish(id, oldName) {
@@ -459,20 +459,20 @@ async function saveDish(id) {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
-    toast('淇敼鎴愬姛');
-  } catch (e) { toast('淇敼澶辫触锛? + e.message); }
+    toast('修改成功');
+  } catch (e) { toast('淇敼澶辫触：' + e.message); }
   renderDishes();
 }
 
 async function toggleDish(id) {
-  try { await api('/api/admin/dishes/' + id + '/toggle', { method: 'PUT' }); toast('鐘舵€佸凡鍒囨崲'); renderDishes(); }
-  catch (e) { toast('鎿嶄綔澶辫触锛? + e.message); }
+  try { await api('/api/admin/dishes/' + id + '/toggle', { method: 'PUT' }); toast('状态已切换'); renderDishes(); }
+  catch (e) { toast('操作失败：' + e.message); }
 }
 
 async function deleteDish(id, name) {
-  if (!confirm(`纭畾瑕佸垹闄よ彍鍝併€?{name}銆嶅悧锛焋)) return;
-  try { await api('/api/admin/dishes/' + id, { method: 'DELETE' }); toast('宸插垹闄?); renderDishes(); }
-  catch (e) { toast('鍒犻櫎澶辫触锛? + e.message); }
+  if (!confirm(`确定要删除菜品「{name}」吗？)) return;
+  try { await api('/api/admin/dishes/' + id, { method: 'DELETE' }); toast('已删除); renderDishes(); }
+  catch (e) { toast('删除澶辫触：' + e.message); }
 }
 </script>
 </body>
