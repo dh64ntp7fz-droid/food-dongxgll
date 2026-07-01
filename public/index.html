@@ -5,92 +5,113 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>湘阁里辣 · 不能隔夜菜品上报</title>
 <style>
-:root{--p:#B22222;--g:#C9A96E;--t:#1a1a1a;--t2:#666;--gr:#2E7D32;--g-bg:#E8F5E9;--r:#C62828;--r-bg:#FFEBEE;--bg:#f2eee9;--c:#fff;--r:10px}
+:root{--p:#B22222;--gld:#C9A96E;--t:#1a1a1a;--t2:#888;--gr:#2E7D32;--g-bg:#E8F5E9;--r:#C62828;--r-bg:#FFEBEE;--bg:#EBE5DD;--c:#fff;--r:12px;--s:0 2px 8px rgba(0,0,0,.06)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t);-webkit-font-smoothing:antialiased}
 .app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+
 /* Top */
-.top{background:linear-gradient(135deg,#5C0A0A 0%,#9B1B1B 30%,#7A1212 70%,#5C0A0A 100%);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(201,169,110,.4);box-shadow:0 2px 8px rgba(100,8,8,.2)}
-.top-l{display:flex;align-items:center;gap:8px}.top-l img{height:24px}
-.top-l .t{line-height:1.2}.top-l .t h1{font-size:15px;font-weight:700}.top-l .t p{font-size:10px;color:var(--g);opacity:.85}
-.top-btn{padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-size:12px;cursor:pointer;font-family:inherit}
-.top-btn:active{background:rgba(255,255,255,.25)}
-/* Setting tabs - at top */
-.stabs{display:none;background:var(--c);border-bottom:1px solid #eee;flex-shrink:0}
-.stab{flex:1;text-align:center;padding:11px 4px;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s}
+.top{background:linear-gradient(135deg,#5C0A0A 0%,#9B1B1B 30%,#7A1212 70%,#5C0A0A 100%);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 3px 12px rgba(100,8,8,.25)}
+.top-l{display:flex;align-items:center;gap:10px}.top-l img{height:26px}
+.top-l .t{line-height:1.25}.top-l .t h1{font-size:16px;font-weight:700}.top-l .t p{font-size:10px;color:var(--gld);opacity:.85;margin-top:1px}
+.top-btn{padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.13);color:#fff;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600}
+.top-btn:active{background:rgba(255,255,255,.25);transform:scale(.96)}
+
+/* Setting tabs */
+.stabs{display:none;background:var(--c);flex-shrink:0;padding:0 12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.stab{display:inline-block;padding:12px 16px;font-size:14px;font-weight:600;color:var(--t2);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .15s}
 .stab.act{color:var(--p);border-bottom-color:var(--p)}
+
 /* Body */
-.body{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.body{flex:1;overflow-y:auto;padding:14px}
 .body-s{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+
+/* Card */
+.card{background:var(--c);border-radius:var(--r);padding:14px;box-shadow:var(--s);margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;letter-spacing:.5px}
+
 /* Region */
-.region-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.region-i{padding:10px 4px;border-radius:var(--r);text-align:center;font-size:13px;font-weight:600;border:1.5px solid #ddd;background:var(--c);cursor:pointer;font-family:inherit;transition:all .1s;line-height:1.2}
-.region-i:active{transform:scale(.96)}
-.region-i.act{border-color:var(--p);background:var(--p);color:#fff}
-.region-i .c{font-size:10px;opacity:.6;display:block;margin-top:1px}
-.region-i.act .c{opacity:.7}
+.region-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.region-i{padding:10px 4px;border-radius:var(--r);text-align:center;font-size:13px;font-weight:600;border:1.5px solid #e5ddd3;background:var(--c);cursor:pointer;font-family:inherit;transition:all .12s;line-height:1.3;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.region-i:active{transform:scale(.95)}
+.region-i.act{border-color:var(--p);background:var(--p);color:#fff;box-shadow:0 2px 8px rgba(178,34,34,.2)}
+.region-i .c{font-size:10px;opacity:.6;display:block;margin-top:2px}
+.region-i.act .c{opacity:.75}
+
 /* Store */
-.store-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.store-i{padding:14px 8px;border-radius:var(--r);text-align:center;font-size:14px;font-weight:600;border:1.5px solid #ddd;background:var(--c);cursor:pointer;font-family:inherit;transition:all .1s}
-.store-i:active{transform:scale(.96)}
-.store-i.act{border-color:var(--p);background:var(--r-bg);color:var(--p)}
+.store-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.store-i{padding:14px 8px;border-radius:var(--r);text-align:center;font-size:14px;font-weight:600;border:1.5px solid #e5ddd3;background:var(--c);cursor:pointer;font-family:inherit;transition:all .12s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.store-i:active{transform:scale(.95)}
+.store-i.act{border-color:var(--p);background:linear-gradient(135deg,#FFF5F5,#FFEBEE);color:var(--p);box-shadow:0 2px 8px rgba(178,34,34,.1)}
+
+/* Labels */
+.sl{font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.st{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.st-l{display:flex;align-items:center;gap:6px}.st-l .n{font-size:16px;font-weight:700}
+.st .b{font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid #e5ddd3;background:var(--c);color:var(--t2);cursor:pointer;font-family:inherit;font-weight:600}
+.st .b:active{background:#f5f0eb}
+
 /* Dish */
-.dish-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
-.dish-i{display:flex;align-items:center;justify-content:space-between;background:var(--c);border-radius:var(--r);padding:10px 10px;border:1px solid #eeeae5}
+.dish-group-label{font-size:12px;font-weight:700;color:var(--t2);margin:8px 0 4px 2px;display:flex;align-items:center;gap:6px}
+.dish-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.dish-i{display:flex;align-items:center;justify-content:space-between;background:var(--c);border-radius:var(--r);padding:10px 12px;border:1px solid #eeeae5;box-shadow:0 1px 3px rgba(0,0,0,.03)}
 .dish-n{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:600}
-.dish-tag{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600}
-.dish-tag.tg{background:#FFF3E0;color:#E65100}
-.dish-tag.ntg{background:#E3F2FD;color:#1565C0}
-.dish-tag.all{background:#f0ece5;color:#666}
+.dish-tag{font-size:10px;padding:2px 7px;border-radius:5px;font-weight:600}
+.dish-tag.tg{background:#FFE8D0;color:#BF4A00}
+.dish-tag.ntg{background:#D6ECFF;color:#0055AA}
+.dish-tag.all{background:#f0ece5;color:#888}
 .dish-q{display:flex;align-items:center;gap:4px}
-.dish-q button{width:30px;height:30px;border:none;background:var(--p);color:#fff;border-radius:7px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.dish-q button:active{opacity:.8}
-.dish-q input{width:46px;text-align:center;font-size:16px;font-weight:700;padding:4px;border:1.5px solid #ddd;border-radius:7px;outline:none;font-family:inherit;-moz-appearance:textfield}
-.dish-q input:focus{border-color:var(--p)}
+.dish-q button{width:30px;height:30px;border:none;background:var(--p);color:#fff;border-radius:8px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(178,34,34,.15)}
+.dish-q button:active{transform:scale(.92);opacity:.85}
+.dish-q input{width:46px;text-align:center;font-size:16px;font-weight:700;padding:4px;border:1.5px solid #ddd;border-radius:8px;outline:none;font-family:inherit;-moz-appearance:textfield}
+.dish-q input:focus{border-color:var(--p);box-shadow:0 0 0 2px rgba(178,34,34,.08)}
 .dish-q input::-webkit-outer-spin-button,.dish-q input::-webkit-inner-spin-button{-webkit-appearance:none}
-/* Buttons */
-.btn-p{width:100%;padding:14px;font-size:16px;font-weight:700;border:none;border-radius:var(--r);background:linear-gradient(135deg,var(--p),#D4443F);color:#fff;cursor:pointer;font-family:inherit;letter-spacing:2px;box-shadow:0 4px 12px rgba(178,34,34,.25)}
-.btn-p:active{transform:scale(.98)}.btn-p:disabled{background:#ccc;box-shadow:none;cursor:default;transform:none}
-.btn-s{width:100%;padding:12px;font-size:15px;font-weight:600;border:none;border-radius:var(--r);background:#f2eee9;color:var(--t);cursor:pointer;font-family:inherit;margin-top:6px}
-.btn-s:active{background:#e5e0d9}
-.sl{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:4px;display:flex;align-items:center;gap:4px}
-.st{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.st-l{display:flex;align-items:center;gap:4px}.st-l .n{font-size:15px;font-weight:700}
-.st .b{font-size:12px;padding:3px 8px;border-radius:5px;border:1px solid var(--p);background:none;color:var(--p);cursor:pointer;font-family:inherit}
-/* Success */
-.succ{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
-.succ .i{width:72px;height:72px;border-radius:50%;background:var(--gr);display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:36px;color:#fff}
-.succ h2{font-size:20px;margin-bottom:6px}.succ p{font-size:14px;color:var(--t2);margin-bottom:20px;line-height:1.7}
-.succ .btn-p,.succ .btn-s{max-width:260px}
+
+.btn-p{width:100%;padding:14px;font-size:16px;font-weight:700;border:none;border-radius:var(--r);background:linear-gradient(135deg,var(--p),#D4443F);color:#fff;cursor:pointer;font-family:inherit;letter-spacing:2px;box-shadow:0 4px 14px rgba(178,34,34,.3)}
+.btn-p:active{transform:scale(.98)}.btn-p:disabled{background:#b0a8a0;box-shadow:none;cursor:default;transform:none}
+.btn-s{width:100%;padding:12px;font-size:15px;font-weight:600;border:none;border-radius:var(--r);background:var(--c);color:var(--t);cursor:pointer;font-family:inherit;margin-top:6px;box-shadow:var(--s)}
+.btn-s:active{background:#f8f4ef;transform:scale(.98)}
+
+.succ{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;background:linear-gradient(180deg,#fff 0%,#f8f4ef 100%)}
+.succ .i{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--gr),#4CAF50);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:40px;color:#fff;box-shadow:0 4px 16px rgba(46,125,50,.25)}
+.succ h2{font-size:22px;margin-bottom:6px}.succ p{font-size:14px;color:var(--t2);margin-bottom:24px;line-height:1.7}
+.succ .btn-p,.succ .btn-s{max-width:260px;margin:4px auto}
+
 /* Setting */
-.set-body{padding:14px;flex:1;overflow-y:auto}
-.set-sec{margin-bottom:16px}.set-sec-t{font-size:13px;font-weight:600;color:var(--t);margin-bottom:8px}
-.set-r{display:flex;gap:6px;align-items:center;margin-bottom:6px}
-.set-r input{flex:1;padding:7px 10px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;outline:none;font-family:inherit}
-.set-r input:focus{border-color:var(--p)}
-.set-c{background:var(--bg);border-radius:8px;padding:8px 10px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
-.set-c .n{font-size:13px;font-weight:600}
-.set-c .ac{display:flex;gap:4px;flex-shrink:0}
-.set-c .ac button{padding:3px 8px;font-size:11px;border-radius:5px;border:none;cursor:pointer;font-weight:600;font-family:inherit}
-.set-c .ac .b1{background:var(--p);color:#fff}
-.set-c .ac .b2{background:var(--c);color:var(--p);border:1px solid var(--p)}
-.set-c .ac .b3{background:none;color:var(--t2)}
-.set-c .ac select{padding:3px 6px;font-size:11px;border-radius:5px;border:1px solid #ddd;font-family:inherit;outline:none}
-.region-box{background:var(--bg);border-radius:var(--r);padding:10px 12px;margin-bottom:10px}
-.region-box .rh{font-weight:700;font-size:14px;margin-bottom:6px}
-.tag{display:inline-block;padding:1px 6px;border-radius:5px;font-size:10px;font-weight:600}
+.set-body{padding:16px;flex:1;overflow-y:auto}
+.set-sec{margin-bottom:20px}
+.set-sec-t{font-size:13px;font-weight:700;color:var(--t);margin-bottom:10px;display:flex;align-items:center;gap:4px}
+.set-r{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.set-r input{flex:1;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;outline:none;font-family:inherit;background:#fafafa}
+.set-r input:focus{border-color:var(--p);background:#fff;box-shadow:0 0 0 3px rgba(178,34,34,.06)}
+.set-r select{padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;outline:none;font-family:inherit;background:#fafafa}
+.set-btn{padding:9px 16px;font-size:12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-family:inherit;white-space:nowrap;transition:all .12s}
+.set-btn:active{transform:scale(.95)}
+.set-btn.rd{background:var(--p);color:#fff;box-shadow:0 2px 6px rgba(178,34,34,.2)}
+.set-btn.gr{background:var(--gr);color:#fff;box-shadow:0 2px 6px rgba(46,125,50,.15)}
+.set-btn.ol{background:var(--c);color:var(--p);border:1.5px solid var(--p)}
+.set-btn.gh{background:none;color:var(--t2)}
+.set-c{background:var(--c);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;border:1px solid #ece6de;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.set-c .n{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.set-c .ac{display:flex;gap:4px;flex-shrink:0;align-items:center}
+.set-c .ac select{padding:4px 8px;font-size:11px;border-radius:5px;border:1px solid #ddd;font-family:inherit;outline:none}
+.set-c .ac button{padding:4px 10px;font-size:11px;border-radius:6px;border:none;cursor:pointer;font-weight:600;font-family:inherit;transition:all .1s}
+.set-c .ac button:active{transform:scale(.94)}
+.region-box{background:var(--c);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--s);border:1px solid #ece6de}
+.region-box .rh{font-weight:700;font-size:15px;margin-bottom:10px;color:var(--t)}
+.tag{display:inline-block;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:600}
 .tag-o{background:var(--g-bg);color:var(--gr)}.tag-x{background:var(--r-bg);color:var(--r)}
-.err{background:var(--r-bg);border:1px solid #ffcdd2;border-radius:var(--r);padding:12px;color:var(--r);font-size:14px}
-.load{text-align:center;padding:40px;color:var(--t2);font-size:14px}
-.toast{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:9999;background:#333;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none}
-.toast.s{opacity:1}.toast.e{background:var(--r)}
+.err{background:var(--r-bg);border:1px solid #ffcdd2;border-radius:var(--r);padding:14px;color:var(--r);font-size:14px;margin:14px}
+.load{text-align:center;padding:48px;color:var(--t2);font-size:14px}
+.toast{position:fixed;top:56px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(30,30,30,.92);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;backdrop-filter:blur(8px)}
+.toast.s{opacity:1}.toast.e{background:rgba(198,40,40,.9)}
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <div class="top">
     <div class="top-l" id="topL">
-      <img src="/logo.png" alt="湘阁里辣">
+      <img src="/logo.png" alt="logo">
       <div class="t"><h1 id="pgTitle">不能隔夜菜品上报</h1><p id="pgSub"></p></div>
     </div>
     <button class="top-btn" id="topBtn" onclick="onBtn()">⚙️ 设置</button>
@@ -103,135 +124,109 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
   <div class="body" id="bw"><div id="main"></div></div>
 </div>
 <div class="toast" id="toast"></div>
-
 <script>
-var A='',T=new Date().toISOString().split('T')[0],
-  _s=[],_d=[],_r=[],q={},sid=null,rid=null,ing=false,pg='home',
-  _sl=[],_dl=[],_rl=[];
-function tt(m,e){var el=document.getElementById('toast');el.textContent=m;el.className='toast'+(e?' e':'')+' s';setTimeout(function(){el.className='toast'},2000)}
+var A='',T=new Date().toISOString().split('T')[0],_s=[],_d=[],_r=[],q={},sid=null,rid=null,ing=false,pg='home',_sl=[],_dl=[],_rl=[];
+function tt(m,e){var el=document.getElementById('toast');el.textContent=m;el.className='toast'+(e?' e':'')+' s';setTimeout(function(){el.className='toast'},2200)}
 document.getElementById('pgSub').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric'})+' · 20:00前填报';
 async function api(u,o){o=o||{};var r=await fetch(A+u,o);var d=await r.json();if(!r.ok)throw new Error(d.error||'请求失败');return d}
 
 function onBtn(){
-  if(pg==='home'){pg='set';document.getElementById('stabs').style.display='flex';
-    document.getElementById('topL').innerHTML='<div class="t"><h1>⚙️ 设置</h1><p style="font-size:10px;opacity:.8;color:var(--g)">门店 · 菜品 · 机器人</p></div>';
+  if(pg==='home'){
+    pg='set';document.getElementById('stabs').style.display='block';
+    document.getElementById('topL').innerHTML='<div class="t"><h1>⚙️ 设置</h1><p style="font-size:10px;opacity:.8;color:var(--gld)">门店 · 菜品 · 机器人</p></div>';
     document.getElementById('topBtn').textContent='⬅ 填报';document.getElementById('bw').className='body-s';
     document.getElementById('main').innerHTML='<div class="load">加载中...</div>';
     document.querySelectorAll('.stab').forEach(function(t,i){t.classList.toggle('act',i===0)});lSet('stores')
   }else{
     pg='home';document.getElementById('stabs').style.display='none';
-    document.getElementById('topL').innerHTML='<img src="/logo.png" alt="湘阁里辣"><div class="t"><h1>不能隔夜菜品上报</h1><p id="pgSub2"></p></div>';
+    document.getElementById('topL').innerHTML='<img src="/logo.png" alt="logo"><div class="t"><h1>不能隔夜菜品上报</h1><p id="pgSub2"></p></div>';
     document.getElementById('pgSub2').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric'})+' · 20:00前填报';
     document.getElementById('topBtn').textContent='⚙️ 设置';document.getElementById('bw').className='body';home()
   }
 }
-
-// ══════ 首页 ══════
 async function home(){
   try{
     var rr=await Promise.all([fetch(A+'/api/stores'),fetch(A+'/api/dishes'),fetch(A+'/api/admin/regions')]);
     _s=await rr[0].json();_d=await rr[1].json();_r=await rr[2].json();
-    if(!_s.length||!_d.length){document.getElementById('main').innerHTML='<div class="err">暂无可选门店或菜品，请联系管理员配置。</div>';return}
+    if(!_s.length||!_d.length){document.getElementById('main').innerHTML='<div class="load">暂无门店或菜品</div>';return}
     _d.forEach(function(d){q[d.id]=0});if(!rid&&_r.length)rid=_r[0].id;draw();
-  }catch(e){document.getElementById('main').innerHTML='<div class="err">加载失败：'+e.message+'</div>'}
+  }catch(e){document.getElementById('main').innerHTML='<div class="load">加载失败</div>'}
 }
-
 function draw(){
   var m=document.getElementById('main');
   var rg=_r.map(function(r){var c=_s.filter(function(s){return Number(s.region_id)===r.id}).length;return'<div class="region-i'+(Number(rid)===r.id?' act':'')+'" onclick="sr('+r.id+')">'+r.name+'<span class="c">'+c+'家</span></div>'}).join('');
   if(sid){
     var st=_s.find(function(s){return s.id===sid});if(!st){sid=null;draw();return}
-    var gs={调改店:[],非调改店:[],通用:[]};
-    _d.forEach(function(d){var g=d.dish_group||'通用';if(!gs[g])gs[g]=[];gs[g].push(d)});
-    var di='';
-    Object.keys(gs).forEach(function(g){
-      if(!gs[g].length)return;
-      var tagCls={调改店:'tg',非调改店:'ntg',通用:'all'}[g]||'all';
-      var tagTxt={调改店:'调改',非调改店:'非调',通用:'全部'}[g]||g;
-      di+='<div style="font-size:11px;font-weight:600;color:var(--t2);margin:4px 0 2px">▸ '+g+'</div>';
-      gs[g].forEach(function(d){di+='<div class="dish-i"><span class="dish-n">'+d.name+'<span class="dish-tag '+tagCls+'">'+tagTxt+'</span></span><div class="dish-q"><button onclick="cq('+d.id+',-1)">−</button><input type="number" id="q'+d.id+'" value="'+(q[d.id]||0)+'" min="0" onchange="oc('+d.id+',this.value)" onfocus="this.select()"><button onclick="cq('+d.id+',1)">+</button></div></div>'});
-    });
-    m.innerHTML='<div class="region-grid">'+rg+'</div><div class="st"><div class="st-l"><span class="n">🏪 '+st.name+'</span></div><button class="b" onclick="sid=null;draw()">换门店</button></div><div class="sl">📋 剩余数量</div><div class="dish-list">'+di+'</div><button class="btn-p" id="btnS" onclick="sub()">确认提交</button>';
+    var gp={调改店:[],非调改店:[],通用:[]};_d.forEach(function(d){var g=d.dish_group||'通用';if(!gp[g])gp[g]=[];gp[g].push(d)});
+    var di='<div class="card"><div class="card-title">📋 菜品剩余</div>';
+    Object.keys(gp).forEach(function(g){if(!gp[g].length)return;
+      di+='<div class="dish-group-label">▸ '+g+'</div>';
+      gp[g].forEach(function(d){di+='<div class="dish-i"><span class="dish-n">'+d.name+'<span class="dish-tag '+(g==='调改店'?'tg':g==='非调改店'?'ntg':'all')+'">'+(g==='调改店'?'调改':g==='非调改店'?'非调':'全')+'</span></span><div class="dish-q"><button onclick="cq('+d.id+',-1)">−</button><input type="number" id="q'+d.id+'" value="'+(q[d.id]||0)+'" min="0" onchange="oc('+d.id+',this.value)" onfocus="this.select()"><button onclick="cq('+d.id+',1)">+</button></div></div>'})});
+    di+='</div>';
+    m.innerHTML='<div class="card"><div class="card-title">📋 区域</div><div class="region-grid">'+rg+'</div></div><div class="card"><div class="st"><div class="st-l"><span style="color:var(--t2);font-size:12px">🏪</span><span class="n">'+st.name+'</span></div><button class="b" onclick="sid=null;draw()">换</button></div></div>'+di+'<button class="btn-p" id="btnS" onclick="sub()">确认提交</button>';
   }else{
     var fd=rid?_s.filter(function(s){return Number(s.region_id)===Number(rid)}):_s;
     var sg=fd.map(function(s){return'<div class="store-i" onclick="ss('+s.id+')">'+s.name+'</div>'}).join('');
-    m.innerHTML='<div class="sl">📋 区域</div><div class="region-grid">'+rg+'</div><div class="sl" style="margin-top:10px">🏪 门店</div><div class="store-grid">'+(sg||'<div style="color:#999;font-size:13px;grid-column:1/-1">暂无门店</div>')+'</div>';
+    m.innerHTML='<div class="card"><div class="card-title">📋 区域</div><div class="region-grid">'+rg+'</div></div><div class="card"><div class="card-title">🏪 门店</div><div class="store-grid">'+(sg||'<div style="color:#999;font-size:13px;grid-column:1/-1">暂无门店</div>')+'</div></div>';
   }
 }
-function sr(id){rid=Number(id);sid=null;draw()}
-function ss(id){sid=Number(id);draw()}
+function sr(id){rid=Number(id);sid=null;draw()}function ss(id){sid=Number(id);draw()}
 function cq(id,d){q[id]=Math.max(0,(q[id]||0)+d);var e=document.getElementById('q'+id);if(e)e.value=q[id]}
 function oc(id,v){var n=parseInt(v,10);q[id]=isNaN(n)||n<0?0:n;var e=document.getElementById('q'+id);if(e)e.value=q[id]}
-
 async function sub(){
   if(ing||!sid)return;ing=true;var btn=document.getElementById('btnS');btn.disabled=true;btn.textContent='提交中...';
   try{
-    var st=_s.find(function(s){return s.id===sid});if(!st)throw new Error('门店不存在');
+    var st=_s.find(function(s){return s.id===sid});if(!st)throw new Error('');
     var it=_d.map(function(d){return{dish_id:d.id,dish_name:d.name,quantity:q[d.id]||0}});
     var rr=await fetch(A+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({storeId:sid,regionId:st.region_id||0,storeName:st.name,date:T,items:it,submitTime:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})})});
     var d=await rr.json();
-    if(d.success){
-      document.getElementById('bw').className='body-s';document.getElementById('main').innerHTML='<div class="succ"><div class="i">✅</div><h2>提交成功！</h2><p>门店「'+st.name+'」<br>今日数据已提交</p><button class="btn-p" onclick="rst()">⬅ 返回填报</button><button class="btn-s" onclick="rst()">继续填报其他门店</button></div>';
-    }else{alert('提交失败：'+(d.error||'未知错误'));btn.disabled=false;btn.textContent='确认提交'}
-  }catch(e){alert('网络错误：'+e.message);btn.disabled=false;btn.textContent='确认提交'}
+    if(d.success){document.getElementById('bw').className='body-s';document.getElementById('main').innerHTML='<div class="succ"><div class="i">✅</div><h2>提交成功！</h2><p>门店「'+st.name+'」<br>今日数据已提交</p><button class="btn-p" onclick="rst()">⬅ 返回</button></div>'}
+    else{alert('提交失败');btn.disabled=false;btn.textContent='确认提交'}
+  }catch(e){alert('网络错误');btn.disabled=false;btn.textContent='确认提交'}
   ing=false
 }
 function rst(){_d.forEach(function(d){q[d.id]=0});sid=null;document.getElementById('bw').className='body';home()}
 
-// ══════ 设置 ══════
-function sTab(t){
-  document.querySelectorAll('.stab').forEach(function(x){
-    x.classList.toggle('act',x.textContent.includes({stores:'门店',dishes:'菜品',robot:'机器人'}[t]))
-  });
-  document.getElementById('main').innerHTML='<div class="load">加载中...</div>';lSet(t)
-}
+function sTab(t){document.querySelectorAll('.stab').forEach(function(x){x.classList.toggle('act',x.textContent.includes({stores:'门店',dishes:'菜品',robot:'机器人'}[t]))});document.getElementById('main').innerHTML='<div class="load">加载中...</div>';lSet(t)}
 async function lSet(t){
   try{_sl=await api('/api/admin/stores');_dl=await api('/api/admin/dishes');_rl=await api('/api/admin/regions');
     document.getElementById('main').innerHTML='<div class="set-body">'+(t==='stores'?rStores():t==='dishes'?rDishes():rRobot())+'</div>'
-  }catch(e){document.getElementById('main').innerHTML='<div class="err" style="margin:14px">'+e.message+'</div>'}
+  }catch(e){document.getElementById('main').innerHTML='<div class="load">加载失败</div>'}
 }
-
 function rStores(){
-  var h='<div class="set-sec"><div class="set-sec-t">➕ 新增区域</div><div class="set-r"><input id="nR" placeholder="区域名称" onkeydown="if(event.key===\'Enter\')aR()"><button class="b1" onclick="aR()" style="padding:7px 14px;font-size:12px;border-radius:7px;border:none;background:var(--p);color:#fff;cursor:pointer;font-weight:600;font-family:inherit;white-space:nowrap">新增</button></div></div>';
-  _rl.forEach(function(r){
-    var rs=_sl.filter(function(s){return Number(s.region_id)===r.id});
-    h+='<div class="region-box"><div class="rh">📍 '+r.name+'</div><div class="set-r"><input id="ns_'+r.id+'" placeholder="店名" onkeydown="if(event.key===\'Enter\')aS('+r.id+')"><button class="b1" onclick="aS('+r.id+')" style="padding:5px 10px;font-size:11px;border-radius:5px;border:none;background:var(--gr);color:#fff;cursor:pointer;font-weight:600;font-family:inherit;white-space:nowrap">+门店</button></div>';
-    rs.forEach(function(s){h+='<div class="set-c"><span class="n">'+s.name+' <span class="tag '+(s.active?'tag-o':'tag-x')+'">'+(s.active?'启用':'停用')+'</span></span><span class="ac"><button class="b2" onclick="eS('+s.id+')">编辑</button><button class="b2" onclick="tS('+s.id+')">'+(s.active?'停用':'启用')+'</button><button class="b3" onclick="dS('+s.id+')">✕</button></span></div>'});
-    if(!rs.length)h+='<div style="color:#bbb;font-size:12px;margin:4px 0;">暂无门店</div>';
-    h+='</div>'
+  var h='<div class="card"><div class="set-sec-t">➕ 新增区域</div><div class="set-r"><input id="nR" placeholder="区域名称"><button class="set-btn rd" onclick="aR()">新增</button></div></div>';
+  _rl.forEach(function(r){var rs=_sl.filter(function(s){return Number(s.region_id)===r.id});
+    h+='<div class="region-box"><div class="rh">📍 '+r.name+'</div><div class="set-r"><input id="ns_'+r.id+'" placeholder="门店名称"><button class="set-btn gr" onclick="aS('+r.id+')">+门店</button></div>';
+    rs.forEach(function(s){h+='<div class="set-c"><span class="n">'+s.name+' <span class="tag '+(s.active?'tag-o':'tag-x')+'">'+(s.active?'启用':'停用')+'</span></span><span class="ac"><button class="set-btn ol" onclick="eS('+s.id+')">编辑</button><button class="set-btn ol" onclick="tS('+s.id+')">'+(s.active?'停用':'启用')+'</button><button class="set-btn gh" onclick="dS('+s.id+')">✕</button></span></div>'});
+    if(!rs.length)h+='<div style="color:#aaa;font-size:12px;margin:6px 0;">暂无门店</div>';h+='</div>'
   });
-  h+='<div style="text-align:center;margin-top:4px"><button class="b3" onclick="lSet(\'stores\')" style="padding:4px 10px;border:none;background:none;color:var(--t2);cursor:pointer;font-size:12px;font-family:inherit">🔄 刷新</button></div>';return h
+  h+='<div style="text-align:center"><button class="set-btn gh" onclick="lSet(\'stores\')" style="padding:6px 14px;font-size:12px;">🔄 刷新</button></div>';return h
 }
-
 function rDishes(){
-  var it=_dl.map(function(d){return'<div class="set-c" style="flex-wrap:wrap;gap:4px"><span class="n">'+d.name+' <span class="tag '+(d.active?'tag-o':'tag-x')+'">'+(d.active?'启用':'停用')+'</span></span><span class="ac"><select id="dg_'+d.id+'" style="padding:3px 6px;font-size:11px;border-radius:5px;border:1px solid #ddd;font-family:inherit;outline:none"><option value="调改店"'+(d.dish_group==='调改店'?' selected':'')+'>调改</option><option value="非调改店"'+(d.dish_group==='非调改店'?' selected':'')+'>非调</option><option value="通用"'+(d.dish_group==='通用'||!d.dish_group?' selected':'')+'>通用</option></select><button class="b2" onclick="eD('+d.id+')">改名</button><button class="b2" onclick="tD('+d.id+')">'+(d.active?'停用':'启用')+'</button><button class="b3" onclick="dD('+d.id+')">✕</button></span></div>'}).join('');
-  return'<div class="set-sec"><div class="set-sec-t">➕ 新增菜品</div><div class="set-r" style="flex-wrap:wrap"><input id="nD" placeholder="菜品名称" style="flex:1;min-width:120px" onkeydown="if(event.key===\'Enter\')aD()"><select id="nDg" style="padding:7px 10px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;outline:none;font-family:inherit"><option value="调改店">调改店</option><option value="非调改店">非调改店</option><option value="通用" selected>通用</option></select><button class="b1" onclick="aD()" style="padding:7px 14px;font-size:12px;border-radius:7px;border:none;background:var(--gr);color:#fff;cursor:pointer;font-weight:600;font-family:inherit;white-space:nowrap">新增</button></div>'+(it||'<div style="color:#999;font-size:13px">暂无菜品</div>')+'</div><div style="text-align:center;margin-top:4px"><button class="b3" onclick="lSet(\'dishes\')" style="padding:4px 10px;border:none;background:none;color:var(--t2);cursor:pointer;font-size:12px;font-family:inherit">🔄 刷新</button></div>'
+  var it=_dl.map(function(d){return'<div class="set-c"><span class="n">'+d.name+' <span class="tag '+(d.active?'tag-o':'tag-x')+'">'+(d.active?'启用':'停用')+'</span></span><span class="ac"><select id="dg_'+d.id+'"><option value="调改店"'+(d.dish_group==='调改店'?' selected':'')+'>调改</option><option value="非调改店"'+(d.dish_group==='非调改店'?' selected':'')+'>非调</option><option value="通用"'+(d.dish_group==='通用'||!d.dish_group?' selected':'')+'>通用</option></select><button class="set-btn ol" onclick="eD('+d.id+')">改名</button><button class="set-btn ol" onclick="tD('+d.id+')">'+(d.active?'停用':'启用')+'</button><button class="set-btn gh" onclick="dD('+d.id+')">✕</button></span></div>'}).join('');
+  return'<div class="card"><div class="set-sec-t">➕ 新增菜品</div><div class="set-r"><input id="nD" placeholder="菜品名称" style="flex:1"><select id="nDg"><option value="调改店">调改店</option><option value="非调改店">非调改店</option><option value="通用">通用</option></select><button class="set-btn gr" onclick="aD()">新增</button></div>'+(it||'<div style="color:#aaa;font-size:13px">暂无菜品</div>')+'</div><div style="text-align:center"><button class="set-btn gh" onclick="lSet(\'dishes\')" style="padding:6px 14px;font-size:12px;">🔄 刷新</button></div>'
 }
-
 function rRobot(){
-  if(!window._whU)return'<div style="padding:30px 20px;text-align:center"><div style="font-size:32px;margin-bottom:10px">🔒</div><div style="font-size:16px;font-weight:600;color:var(--p);margin-bottom:10px">修改机器人设置</div><input id="wA" placeholder="我是谁？" style="width:200px;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:15px;outline:none;font-family:inherit;text-align:center" onkeydown="if(event.key===\'Enter\')uR()"><div style="margin-top:8px"><button class="b2" onclick="uR()" style="padding:6px 24px;font-size:13px;border-radius:6px;border:1.5px solid var(--p);background:var(--c);color:var(--p);cursor:pointer;font-weight:600;font-family:inherit">验证</button></div><div id="wE" style="font-size:12px;color:var(--r);margin-top:6px"></div></div>';
-  var it=_rl.map(function(r){return'<div class="set-c" style="flex-direction:column;align-items:stretch;gap:6px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center"><span class="n">📍 '+r.name+'</span><span class="tag '+(r.webhook_url?'tag-o':'tag-x')+'">'+(r.webhook_url?'已配置':'未配置')+'</span></div><div class="set-r"><input id="w_'+r.id+'" value="'+(r.webhook_url||'').replace(/"/g,'&quot;')+'" placeholder="Webhook 地址" style="flex:1;padding:6px 8px;border:1.5px solid #ddd;border-radius:6px;font-size:12px;outline:none;font-family:inherit"><button class="b1" onclick="sW('+r.id+')" style="padding:5px 10px;font-size:11px;border-radius:5px;border:none;background:var(--gr);color:#fff;cursor:pointer;font-weight:600;font-family:inherit;white-space:nowrap">保存</button>'+(r.webhook_url?'<button class="b2" onclick="tW('+r.id+')" style="padding:5px 10px;font-size:11px;border-radius:5px">测试</button>':'')+'</div></div>'}).join('');
-  return'<div style="font-size:12px;color:var(--t2);margin-bottom:10px">每个区域独立配置企业微信群机器人。</div>'+(it||'<div style="color:#999;font-size:13px">暂无区域</div>')+'<div style="text-align:center;margin-top:6px"><button class="b3" onclick="lR()" style="padding:4px 10px;border:none;background:none;color:var(--t2);cursor:pointer;font-size:12px;font-family:inherit">🔒 锁定</button><button class="b3" onclick="lSet(\'robot\')" style="padding:4px 10px;border:none;background:none;color:var(--t2);cursor:pointer;font-size:12px;font-family:inherit;margin-left:6px">🔄 刷新</button></div>'
+  if(!window._whU)return'<div class="card" style="padding:40px 20px;text-align:center;margin-top:20px"><div style="font-size:40px;margin-bottom:12px">🔒</div><div style="font-size:17px;font-weight:700;color:var(--p);margin-bottom:12px">修改机器人</div><input id="wA" placeholder="我是谁？" style="width:200px;padding:10px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;outline:none;font-family:inherit;text-align:center" onkeydown="if(event.key===\'Enter\')uR()"><div style="margin-top:10px"><button class="set-btn ol" onclick="uR()" style="padding:8px 28px;font-size:14px">验证</button></div><div id="wE" style="font-size:12px;color:var(--r);margin-top:8px"></div></div>';
+  var it=_rl.map(function(r){return'<div class="set-c" style="flex-direction:column;align-items:stretch;gap:8px;margin-bottom:8px;padding:14px"><div style="display:flex;justify-content:space-between"><span class="n" style="font-size:14px">📍 '+r.name+'</span><span class="tag '+(r.webhook_url?'tag-o':'tag-x')+'">'+(r.webhook_url?'已配':'未配')+'</span></div><div class="set-r"><input id="w_'+r.id+'" value="'+(r.webhook_url||'').replace(/"/g,'&quot;')+'" placeholder="Webhook"><button class="set-btn gr" onclick="sW('+r.id+')">保存</button>'+(r.webhook_url?'<button class="set-btn ol" onclick="tW('+r.id+')">测试</button>':'')+'</div></div>'}).join('');
+  return'<div style="font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.6">每个区域独立配置企微机器人。</div>'+(it||'<div style="color:#aaa;font-size:13px">暂无区域</div>')+'<div style="text-align:center"><button class="set-btn gh" onclick="lR()" style="padding:6px 14px;font-size:12px">🔒 锁定</button><button class="set-btn gh" onclick="lSet(\'robot\')" style="padding:6px 14px;font-size:12px;margin-left:6px">🔄 刷新</button></div>'
 }
-
 function uR(){var i=document.getElementById('wA'),e=document.getElementById('wE');if(!i)return;if(i.value.trim()==='无敌小帅'){window._whU=true;lSet('robot')}else{e.textContent='暗号不对哦～'}}
 function lR(){window._whU=false;lSet('robot')}
-
-async function aR(){var i=document.getElementById('nR'),n=i.value.trim();if(!n)return tt('请输入区域名称');try{await api('/api/admin/regions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});i.value='';tt('添加成功');lSet('stores')}catch(e){tt('添加失败：'+e.message,true)}}
-async function aS(rid){var i=document.getElementById('ns_'+rid),n=i.value.trim();if(!n)return tt('请输入门店名称');try{await api('/api/admin/stores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,region_id:rid})});i.value='';tt('添加成功');lSet('stores');fS()}catch(e){tt('添加失败：'+e.message,true)}}
-function eS(id){var s=_sl.find(function(x){return x.id===id});if(!s)return;var nn=prompt('修改门店名称：',s.name);if(nn&&nn.trim())sS(id,nn.trim())}
-async function sS(id,n){try{await api('/api/admin/stores/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});tt('修改成功');lSet('stores');fS()}catch(e){tt('修改失败：'+e.message,true)}}
-async function tS(id){try{await api('/api/admin/stores/'+id+'/toggle',{method:'PUT'});tt('状态已切换');lSet('stores');fS()}catch(e){tt('操作失败：'+e.message,true)}}
-async function dS(id){var s=_sl.find(function(x){return x.id===id});if(!s)return;if(!confirm('确定删除「'+s.name+'」吗？'))return;try{await api('/api/admin/stores/'+id,{method:'DELETE'});tt('已删除');lSet('stores');fS()}catch(e){tt('删除失败：'+e.message,true)}}
-async function aD(){var i=document.getElementById('nD'),n=i.value.trim();if(!n)return tt('请输入菜品名称');var g=document.getElementById('nDg').value;try{await api('/api/admin/dishes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,dish_group:g})});i.value='';tt('添加成功');lSet('dishes')}catch(e){tt('添加失败：'+e.message,true)}}
-function eD(id){var d=_dl.find(function(x){return x.id===id});if(!d)return;var nn=prompt('修改菜品名称：',d.name);if(!nn||!nn.trim())return;var ng=document.getElementById('dg_'+id).value;sD(id,nn.trim(),ng)}
-async function sD(id,n,g){try{await api('/api/admin/dishes/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,dish_group:g})});tt('修改成功');lSet('dishes')}catch(e){tt('修改失败：'+e.message,true)}}
-async function tD(id){try{await api('/api/admin/dishes/'+id+'/toggle',{method:'PUT'});tt('状态已切换');lSet('dishes')}catch(e){tt('操作失败：'+e.message,true)}}
-async function dD(id){var d=_dl.find(function(x){return x.id===id});if(!d)return;if(!confirm('确定删除「'+d.name+'」吗？'))return;try{await api('/api/admin/dishes/'+id,{method:'DELETE'});tt('已删除');lSet('dishes')}catch(e){tt('删除失败：'+e.message,true)}}
-async function sW(id){var i=document.getElementById('w_'+id);if(!i)return;var u=i.value.trim(),r=_rl.find(function(x){return x.id===id});if(!r)return;try{await api('/api/admin/regions/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:r.name,webhook_url:u})});tt('Webhook 已保存')}catch(e){tt('保存失败：'+e.message,true)}}
-async function tW(id){try{var r=await api('/api/admin/regions/'+id+'/test-webhook',{method:'POST'});tt(r.success?'✅ 测试消息发送成功！':'❌'+(r.error||'发送失败'))}catch(e){tt('❌'+e.message,true)}}
+async function aR(){var i=document.getElementById('nR'),n=i.value.trim();if(!n)return tt('请输入区域名称');try{await api('/api/admin/regions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});i.value='';tt('✅ 添加成功');lSet('stores')}catch(e){tt('失败',true)}}
+async function aS(rid){var i=document.getElementById('ns_'+rid),n=i.value.trim();if(!n)return tt('请输入门店名称');try{await api('/api/admin/stores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,region_id:rid})});i.value='';tt('✅ 添加成功');lSet('stores');fS()}catch(e){tt('失败',true)}}
+function eS(id){var s=_sl.find(function(x){return x.id===id});if(!s)return;var nn=prompt('修改名称：',s.name);if(nn&&nn.trim())sS(id,nn.trim())}
+async function sS(id,n){try{await api('/api/admin/stores/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n})});tt('✅ 已修改');lSet('stores');fS()}catch(e){tt('失败',true)}}
+async function tS(id){try{await api('/api/admin/stores/'+id+'/toggle',{method:'PUT'});tt('✅ 已切换');lSet('stores');fS()}catch(e){tt('失败',true)}}
+async function dS(id){var s=_sl.find(function(x){return x.id===id});if(!s)return;if(!confirm('删除「'+s.name+'」吗？'))return;try{await api('/api/admin/stores/'+id,{method:'DELETE'});tt('已删除');lSet('stores');fS()}catch(e){tt('失败',true)}}
+async function aD(){var i=document.getElementById('nD'),n=i.value.trim();if(!n)return tt('请输入菜品名称');var g=document.getElementById('nDg').value;try{await api('/api/admin/dishes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,dish_group:g})});i.value='';tt('✅ 添加成功');lSet('dishes')}catch(e){tt('失败',true)}}
+function eD(id){var d=_dl.find(function(x){return x.id===id});if(!d)return;var nn=prompt('修改名称：',d.name);if(!nn||!nn.trim())return;sD(id,nn.trim(),document.getElementById('dg_'+id).value)}
+async function sD(id,n,g){try{await api('/api/admin/dishes/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,dish_group:g})});tt('✅ 已修改');lSet('dishes')}catch(e){tt('失败',true)}}
+async function tD(id){try{await api('/api/admin/dishes/'+id+'/toggle',{method:'PUT'});tt('✅ 已切换');lSet('dishes')}catch(e){tt('失败',true)}}
+async function dD(id){var d=_dl.find(function(x){return x.id===id});if(!d)return;if(!confirm('删除「'+d.name+'」吗？'))return;try{await api('/api/admin/dishes/'+id,{method:'DELETE'});tt('已删除');lSet('dishes')}catch(e){tt('失败',true)}}
+async function sW(id){var i=document.getElementById('w_'+id);if(!i)return;var u=i.value.trim(),r=_rl.find(function(x){return x.id===id});if(!r)return;try{await api('/api/admin/regions/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:r.name,webhook_url:u})});tt('✅ 已保存')}catch(e){tt('失败',true)}}
+async function tW(id){try{var r=await api('/api/admin/regions/'+id+'/test-webhook',{method:'POST'});tt(r.success?'✅ 测试成功':'❌ 发送失败')}catch(e){tt('❌ 失败',true)}}
 async function fS(){try{var r=await fetch(A+'/api/stores');_s=await r.json()}catch(_){}}
-
 home();
 </script>
 </body>
