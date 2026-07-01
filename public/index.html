@@ -181,13 +181,7 @@ body {
     <button class="settings-close" onclick="closeSettings()">✕</button>
     <h2>⚙️ 管理设置</h2>
     <div id="settingsBody">
-      <div class="login-pwd-wrap" id="settingsLogin">
-        <input type="password" id="settingsPwd" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')authSettings()">
-        <div class="err" id="settingsErr"></div>
-        <button class="btn btn-primary" style="padding:10px;font-size:14px;" onclick="authSettings()">验证</button>
-        <div class="login-hint">默认密码：admin123</div>
-      </div>
-      <div id="settingsContent" style="display:none;"></div>
+      <div id="settingsContent"></div>
     </div>
   </div>
 </div>
@@ -195,7 +189,6 @@ body {
 <script>
 var API = '';
 var TODAY = new Date().toISOString().split('T')[0];
-var TOKEN = localStorage.getItem('fw_token') || '';
 
 var stores = [];
 var dishes = [];
@@ -360,14 +353,7 @@ function resetForm() {
 
 function openSettings() {
   document.getElementById('settingsOverlay').classList.add('show');
-  if (TOKEN) {
-    showSettingsContent();
-  } else {
-    document.getElementById('settingsLogin').style.display = 'block';
-    document.getElementById('settingsContent').style.display = 'none';
-    document.getElementById('settingsPwd').value = '';
-    document.getElementById('settingsErr').textContent = '';
-  }
+  showSettingsContent();
 }
 
 function closeSettings() {
@@ -379,39 +365,10 @@ document.getElementById('settingsOverlay').addEventListener('click', function(e)
   if (e.target === this) closeSettings();
 });
 
-async function authSettings() {
-  var pwd = document.getElementById('settingsPwd').value;
-  var err = document.getElementById('settingsErr');
-  try {
-    var res = await fetch(API + '/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pwd }),
-    });
-    var data = await res.json();
-    if (data.success) {
-      TOKEN = data.token;
-      localStorage.setItem('fw_token', TOKEN);
-      showSettingsContent();
-    } else {
-      err.textContent = '密码错误';
-    }
-  } catch (e) {
-    err.textContent = '验证失败：' + e.message;
-  }
-}
 
 async function api(url, opts) {
   opts = opts || {};
-  var headers = Object.assign({}, opts.headers || {});
-  if (TOKEN) headers['x-admin-token'] = TOKEN;
-  var res = await fetch(API + url, Object.assign({}, opts, { headers: headers }));
-  if (res.status === 401) {
-    TOKEN = ''; localStorage.removeItem('fw_token');
-    document.getElementById('settingsLogin').style.display = 'block';
-    document.getElementById('settingsContent').style.display = 'none';
-    throw new Error('登录已过期');
-  }
+  var res = await fetch(API + url, opts);
   var data = await res.json();
   if (!res.ok) throw new Error(data.error || '请求失败');
   return data;

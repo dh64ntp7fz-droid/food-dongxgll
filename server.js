@@ -16,17 +16,10 @@ if (fs.existsSync(envPath)) {
 }
 
 const PORT = process.env.PORT || 3000;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-// ================== 管理后台认证 ==================
-function adminAuth(req, res, next) {
-  if (req.headers['x-admin-token'] === ADMIN_PASSWORD) return next();
-  return res.status(401).json({ error: '未授权，请先登录' });
-}
 
 // ================== 厨师长端 API ==================
 
@@ -56,48 +49,41 @@ app.post('/api/submit', (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ================== 管理后台 API ==================
-
-app.post('/api/admin/login', (req, res) => {
-  if (req.body.password === ADMIN_PASSWORD) return res.json({ success: true, token: ADMIN_PASSWORD });
-  return res.status(401).json({ error: '密码错误' });
-});
-
-app.post('/api/admin/verify', adminAuth, (_req, res) => res.json({ success: true }));
+// ================== 管理后台 API（无密码） ==================
 
 // --- 门店管理 ---
-app.get('/api/admin/stores', adminAuth, (_req, res) => {
+app.get('/api/admin/stores', (_req, res) => {
   try { res.json(db.getAllStores()); } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/admin/stores', adminAuth, (req, res) => {
+app.post('/api/admin/stores', (req, res) => {
   try {
     const r = db.addStore(req.body.name, req.body.webhook_url || '');
     res.json({ success: true, id: r.lastInsertRowid });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/admin/stores/:id', adminAuth, (req, res) => {
+app.put('/api/admin/stores/:id', (req, res) => {
   try { db.updateStore(Number(req.params.id), req.body.name); res.json({ success: true }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/admin/stores/:id/toggle', adminAuth, (req, res) => {
+app.put('/api/admin/stores/:id/toggle', (req, res) => {
   try { db.toggleStore(Number(req.params.id)); res.json({ success: true }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/admin/stores/:id', adminAuth, (req, res) => {
+app.delete('/api/admin/stores/:id', (req, res) => {
   try { db.deleteStore(Number(req.params.id)); res.json({ success: true }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/admin/stores/:id/webhook', adminAuth, (req, res) => {
+app.put('/api/admin/stores/:id/webhook', (req, res) => {
   try { db.updateStoreWebhook(Number(req.params.id), req.body.webhook_url || ''); res.json({ success: true }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/admin/stores/:id/test-webhook', adminAuth, (req, res) => {
+app.post('/api/admin/stores/:id/test-webhook', (req, res) => {
   try {
     const stores = db.getAllStores();
     const store = stores.find(s => s.id === Number(req.params.id));
@@ -135,39 +121,39 @@ app.post('/api/admin/stores/:id/test-webhook', adminAuth, (req, res) => {
 });
 
 // --- 菜品管理 ---
-app.get('/api/admin/dishes', adminAuth, (_req, res) => {
+app.get('/api/admin/dishes', (_req, res) => {
   try { res.json(db.getAllDishes()); } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/admin/dishes', adminAuth, (req, res) => {
+app.post('/api/admin/dishes', (req, res) => {
   try { const r = db.addDish(req.body.name); res.json({ success: true, id: r.lastInsertRowid }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/admin/dishes/:id', adminAuth, (req, res) => {
+app.put('/api/admin/dishes/:id', (req, res) => {
   try { db.updateDish(Number(req.params.id), req.body.name); res.json({ success: true }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/admin/dishes/:id/toggle', adminAuth, (req, res) => {
+app.put('/api/admin/dishes/:id/toggle', (req, res) => {
   try { db.toggleDish(Number(req.params.id)); res.json({ success: true }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/admin/dishes/:id', adminAuth, (req, res) => {
+app.delete('/api/admin/dishes/:id', (req, res) => {
   try { db.deleteDish(Number(req.params.id)); res.json({ success: true }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // --- 今日汇总---
-app.get('/api/admin/summary', adminAuth, (req, res) => {
+app.get('/api/admin/summary', (req, res) => {
   try {
     const date = req.query.date || new Date().toISOString().split('T')[0];
     res.json({ date, ...db.getTodaySummary(date) });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.get('/api/admin/report-text', adminAuth, (req, res) => {
+app.get('/api/admin/report-text', (req, res) => {
   try {
     const date = req.query.date || new Date().toISOString().split('T')[0];
     const summary = db.getTodaySummary(date);
@@ -189,7 +175,6 @@ app.get('/api/admin/report-text', adminAuth, (req, res) => {
 // --- 定时提醒检查（给外部 cron 服务调用）---
 app.get('/api/cron/check-reminder', (req, res) => {
   try {
-    if (req.query.token !== ADMIN_PASSWORD) return res.status(401).json({ error: 'token 错误' });
     const date = new Date().toISOString().split('T')[0];
     const summary = db.getTodaySummary(date);
     res.json({
@@ -211,7 +196,5 @@ app.listen(PORT, () => {
   console.log('  餐厅每日菜品报损系统');
   console.log('========================================');
   console.log(`  填报页面 : http://localhost:${PORT}/`);
-  console.log(`  管理后台 : http://localhost:${PORT}/admin.html`);
-  console.log(`  管理密码 : ${ADMIN_PASSWORD}`);
   console.log('========================================');
 });
