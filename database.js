@@ -52,7 +52,7 @@ function initDb() {
       '绿荷/育儿店', '科茗店', '体育馆店'
     ];
     const tx = db.transaction(() => {
-      stores.forEach((s, i) => insertStore.run(s, i, ''));
+      stores.forEach((s, i) => insertStore.run(s, i, 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=44356646-0dda-484b-9a79-fa0ad45b8a50'));
     });
     tx();
   }

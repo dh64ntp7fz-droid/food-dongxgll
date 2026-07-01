@@ -388,13 +388,20 @@ async function showSettingsContent() {
     var dishList = await api('/api/admin/dishes');
 
     var storeItems = storeList.map(function(s) {
-      return '<div class="setting-item">' +
-        '<span class="name">' + s.name + ' <span class="tag ' + (s.active?'tag-on':'tag-off') + '">' + (s.active?'启用':'停用') + '</span></span>' +
-        '<span class="actions">' +
-          '<button class="btn btn-outline-sm btn-sm" onclick="editSettingStore(' + s.id + ')">编辑</button>' +
-          '<button class="btn btn-outline-sm btn-sm" onclick="toggleSettingStore(' + s.id + ')">' + (s.active?'停用':'启用') + '</button>' +
-          '<button class="btn btn-ghost-sm btn-sm" onclick="deleteSettingStore(' + s.id + ')">删除</button>' +
-        '</span>' +
+      return '<div style="background:#fafafa;border-radius:10px;padding:12px;margin-bottom:8px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+          '<span><strong>' + s.name + '</strong> <span class="tag ' + (s.active?'tag-on':'tag-off') + '">' + (s.active?'启用':'停用') + '</span></span>' +
+          '<span style="display:flex;gap:4px;">' +
+            '<button class="btn btn-outline-sm btn-sm" onclick="editSettingStore(' + s.id + ')">编辑</button>' +
+            '<button class="btn btn-outline-sm btn-sm" onclick="toggleSettingStore(' + s.id + ')">' + (s.active?'停用':'启用') + '</button>' +
+            '<button class="btn btn-ghost-sm btn-sm" onclick="deleteSettingStore(' + s.id + ')">删除</button>' +
+          '</span>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;align-items:center;">' +
+          '<input id="wh_' + s.id + '" value="' + (s.webhook_url || '') + '" placeholder="默认: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=44356646..." style="flex:1;padding:7px 10px;border:2px solid #e8e8e8;border-radius:6px;font-size:13px;outline:none;font-family:inherit;" onfocus="this.select()">' +
+          '<button class="btn btn-green-sm btn-sm" onclick="saveStoreWebhook(' + s.id + ')">保存</button>' +
+          '<button class="btn btn-outline-sm btn-sm" onclick="testStoreWebhook(' + s.id + ')"' + (s.webhook_url ? '' : ' disabled') + '>测试</button>' +
+        '</div>' +
       '</div>';
     }).join('');
 
@@ -450,7 +457,10 @@ async function addSettingStore() {
   try {
     await api('/api/admin/stores', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name }),
+      body: JSON.stringify({
+        name: name,
+        webhook_url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=44356646-0dda-484b-9a79-fa0ad45b8a50',
+      }),
     });
     inp.value = ''; toast('添加成功'); showSettingsContent();
     refreshStores();
@@ -494,6 +504,28 @@ async function deleteSettingStore(id) {
     toast('已删除'); showSettingsContent();
     refreshStores();
   } catch (e) { toast('删除失败：' + e.message, true); }
+}
+
+// ── Webhook 配置 ──
+async function saveStoreWebhook(id) {
+  var inp = document.getElementById('wh_' + id);
+  if (!inp) return;
+  var url = inp.value.trim();
+  try {
+    await api('/api/admin/stores/' + id + '/webhook', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ webhook_url: url }),
+    });
+    toast(url ? 'Webhook 已保存' : 'Webhook 已清除');
+    showSettingsContent();
+  } catch (e) { toast('保存失败：' + e.message, true); }
+}
+
+async function testStoreWebhook(id) {
+  try {
+    var r = await api('/api/admin/stores/' + id + '/test-webhook', { method: 'POST' });
+    toast(r.success ? '✅ 测试消息发送成功！请查看企微群' : '❌' + (r.error || '发送失败'));
+  } catch (e) { toast('❌' + e.message, true); }
 }
 
 // ── 菜品操作 ──
