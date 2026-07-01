@@ -100,7 +100,7 @@ function buildReminder() {
   let text = `🍳 不能隔夜菜品系统已上线\n\n`;
   text += `各位厨师长好！从今天起，请每天20:00前在此群填报不能隔夜菜品的剩余数量。\n\n`;
   text += `⏰ 每日19:30自动提醒\n📊 每日20:15自动汇总\n🚨 未填报的门店将被列出\n\n`;
-  text += `──────────────\n`;
+  text += `───────────\n`;
   text += `📋 当前填报进度\n\n`;
   text += `✅ 已填报（${summary.submitted.length}家）：`;
   text += summary.submitted.length > 0 ? summary.submitted.map(s => s.store_name).join('、') : '暂无';
