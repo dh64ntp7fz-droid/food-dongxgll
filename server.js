@@ -84,13 +84,12 @@ function buildSummary() {
   const summary = db.getTodaySummary(date);
   const d = new Date(date + 'T00:00:00+08:00');
   const month = d.getMonth() + 1, day = d.getDate();
-  let text = `📊 菜品报损汇总（${month}月${day}日）\n`;
-  text += `────────────────────\n`;
-  text += `✅ 已提交（${summary.submitted.length}家）：`;
+  let text = `📊 菜品报损汇总（${month}月${day}日）\n\n`;
+  text += `✅ 已填报（${summary.submitted.length}家）：`;
   text += summary.submitted.length > 0 ? summary.submitted.map(s => s.store_name).join('、') : '无';
-  text += `\n❌ 未提交（${summary.notSubmitted.length}家）：`;
+  text += `\n❌ 未填报（${summary.notSubmitted.length}家）：`;
   text += summary.notSubmitted.length > 0 ? summary.notSubmitted.map(s => s.name).join('、') : '无';
-  if (summary.notSubmitted.length > 0) text += '\n⚠️ 请尽快补交！';
+  if (summary.notSubmitted.length > 0) text += '\n\n⚠️ 请尽快补交！';
   return text;
 }
 
@@ -103,9 +102,11 @@ function buildReminder() {
   text += `⏰ 每日19:30自动提醒\n📊 每日20:15自动汇总\n🚨 未填报的门店将被列出\n\n`;
   text += `──────────────\n`;
   text += `📋 当前填报进度\n\n`;
-  text += `✅ 已填报：${summary.submitted.length > 0 ? summary.submitted.map(s => s.store_name).join('、') : '暂无'}\n`;
-  text += `❌ 未填报：${summary.notSubmitted.length > 0 ? summary.notSubmitted.map(s => s.name).join('、') : '全部已填报 🎉'}`;
-  if (summary.notSubmitted.length > 0) text += `\n\n⚠️ 请以上门店厨师长尽快填报！`;
+  text += `✅ 已填报（${summary.submitted.length}家）：`;
+  text += summary.submitted.length > 0 ? summary.submitted.map(s => s.store_name).join('、') : '暂无';
+  text += `\n❌ 未填报（${summary.notSubmitted.length}家）：`;
+  text += summary.notSubmitted.length > 0 ? summary.notSubmitted.map(s => s.name).join('、') : '全部已填报 🎉';
+  if (summary.notSubmitted.length > 0) text += '\n\n⚠️ 请以上门店厨师长尽快填报！';
   return text;
 }
 
