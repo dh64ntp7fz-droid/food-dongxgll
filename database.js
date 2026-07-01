@@ -57,9 +57,14 @@ function initDb() {
   const regionCount = db.prepare('SELECT COUNT(*) as cnt FROM regions').get().cnt;
   if (regionCount === 0) {
     const insert = db.prepare('INSERT INTO regions (name, webhook_url, sort_order) VALUES (?, ?, ?)');
+    const regions = [
+      '袁东升', '夏志平', '刘兆鹏', '刘广', '昌跃兵',
+      '王杰', '王海龙', '罗爱民', '贺剑'
+    ];
     db.transaction(() => {
-      insert.run('袁东升区域', 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=44356646-0dda-484b-9a79-fa0ad45b8a50', 0);
-      insert.run('夏志平区域', '', 1);
+      regions.forEach((name, i) => {
+        insert.run(name, '', i);
+      });
     })();
   }
 
