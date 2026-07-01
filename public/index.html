@@ -18,22 +18,28 @@ body {
   background: var(--bg); color: var(--text); min-height: 100vh;
   display: flex; justify-content: center; padding: 20px;
 }
-.container { width: 100%; max-width: 500px; }
+.container { width: 100%; max-width: 560px; }
 /* ── Header ── */
 .header {
   background: linear-gradient(135deg, #5C0A0A 0%, #9B1B1B 30%, #7A1212 70%, #5C0A0A 100%);
-  color:#fff; padding:24px 20px; border-radius:var(--radius) var(--radius) 0 0;
-  text-align:center;
+  color:#fff; padding:16px 20px; border-radius:var(--radius) var(--radius) 0 0;
+  display:flex; align-items:center; justify-content:space-between;
   border-bottom:2px solid rgba(201,169,110,0.55);
 }
-.header h1 { font-size:22px; font-weight:700; letter-spacing:2px; }
-.header p { font-size:13px; opacity:0.8; margin-top:6px; color:var(--gold); letter-spacing:1px; }
+.header-left h1 { font-size:20px; font-weight:700; letter-spacing:2px; }
+.header-left p { font-size:12px; opacity:0.8; margin-top:2px; color:var(--gold); letter-spacing:1px; }
+.settings-btn {
+  background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
+  color:#fff; padding:6px 12px; border-radius:8px; cursor:pointer;
+  font-size:18px; transition:all .2s;
+}
+.settings-btn:hover { background:rgba(255,255,255,0.25); transform:rotate(30deg); }
 /* ── Content Card ── */
 .content-card {
   background:var(--card-bg); border-radius:0 0 var(--radius) var(--radius);
-  padding:20px 20px; box-shadow:var(--shadow);
+  padding:20px; box-shadow:var(--shadow);
 }
-.form-group { margin-bottom:20px; }
+.form-group { margin-bottom:18px; }
 .form-group label {
   display:block; font-size:13px; font-weight:600; color:var(--text);
   margin-bottom:6px;
@@ -43,14 +49,13 @@ body {
   border-radius:8px; background:#fafafa; appearance:none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 12px center;
-  cursor: pointer; outline:none; font-family:inherit; transition:border-color .2s;
+  cursor: pointer; outline:none; font-family:inherit;
 }
 .form-group select:focus { border-color:var(--primary); }
-/* ── Dish List ── */
-.dish-list { margin-bottom:16px; }
+.dish-list { margin-bottom:12px; }
 .dish-item {
   display:flex; align-items:center; justify-content:space-between;
-  padding:12px 0; border-bottom:1px solid #f0f0f0;
+  padding:10px 0; border-bottom:1px solid #f0f0f0;
 }
 .dish-item:last-child { border-bottom:none; }
 .dish-name { font-size:15px; color:var(--text); flex:1; }
@@ -58,93 +63,165 @@ body {
 .dish-input button {
   width:32px; height:32px; border:2px solid #e8e8e8; background:#fafafa;
   border-radius:8px; font-size:18px; cursor:pointer; color:var(--text-light);
-  display:flex; align-items:center; justify-content:center; transition:all .15s;
+  display:flex; align-items:center; justify-content:center;
 }
 .dish-input button:active { background:var(--gold-light); border-color:var(--gold); }
 .dish-input input {
   width:56px; text-align:center; font-size:16px; font-weight:600; padding:6px;
-  border:2px solid #e8e8e8; border-radius:8px; outline:none; transition:border-color .2s;
+  border:2px solid #e8e8e8; border-radius:8px; outline:none;
   font-family:inherit; -moz-appearance:textfield;
 }
 .dish-input input:focus { border-color:var(--primary); }
 .dish-input input::-webkit-outer-spin-button,
 .dish-input input::-webkit-inner-spin-button { -webkit-appearance:none; }
-/* ── Submit Button ── */
-.btn-submit {
-  width:100%; padding:14px; font-size:17px; font-weight:700;
-  background:linear-gradient(135deg, var(--primary), #D4443F);
-  color:#fff; border:none; border-radius:10px; cursor:pointer;
-  margin-top:8px; transition:all .2s;
-  box-shadow:0 4px 12px rgba(178,34,34,0.3);
-  font-family:inherit; letter-spacing:2px;
+.btn {
+  padding:12px; font-size:15px; font-weight:700; border:none; border-radius:10px;
+  cursor:pointer; font-family:inherit; transition:all .2s;
 }
-.btn-submit:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(178,34,34,0.4); }
-.btn-submit:active { transform:scale(0.98); }
-.btn-submit:disabled { background:#ccc; cursor:not-allowed; transform:none; box-shadow:none; }
-/* ── Status Pages ── */
-.success-box, .already-submitted {
-  text-align:center; padding:60px 20px;
+.btn-primary {
+  width:100%; background:linear-gradient(135deg,var(--primary),#D4443F);
+  color:#fff; box-shadow:0 4px 12px rgba(178,34,34,0.3);
+  letter-spacing:2px;
 }
-.success-box .icon, .already-submitted .icon {
-  width:72px; height:72px; border-radius:50%;
+.btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(178,34,34,0.4); }
+.btn-primary:disabled { background:#ccc; cursor:not-allowed; transform:none; box-shadow:none; }
+.btn-secondary {
+  width:100%; background:#f5f5f5; color:var(--text); margin-top:8px;
+}
+.btn-secondary:hover { background:#e8e8e8; }
+/* ── Success ── */
+.success-page {
+  text-align:center; padding:50px 20px;
+}
+.success-page .icon {
+  width:72px; height:72px; border-radius:50%; background:var(--green);
   display:flex; align-items:center; justify-content:center;
   margin:0 auto 20px; font-size:36px; color:#fff;
 }
-.success-box .icon { background:var(--green); }
-.already-submitted .icon { background:var(--gold); }
-.success-box h2, .already-submitted h2 { font-size:20px; color:var(--text); margin-bottom:8px; }
-.success-box p, .already-submitted p { font-size:14px; color:var(--text-light); }
+.success-page h2 { font-size:20px; color:var(--text); margin-bottom:8px; }
+.success-page p { font-size:14px; color:var(--text-light); margin-bottom:20px; line-height:1.8; }
 .loading { text-align:center; padding:40px; color:var(--text-light); }
-.error-box {
-  background:var(--red-bg); border:1px solid #ffcdd2; border-radius:8px;
-  padding:12px 16px; color:var(--red); font-size:14px; margin-bottom:16px;
+.error-box { background:var(--red-bg); border:1px solid #ffcdd2; border-radius:8px; padding:12px 16px; color:var(--red); font-size:14px; margin-bottom:16px; }
+/* ── 设置面板 ── */
+.settings-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:200;
+  align-items:center; justify-content:center;
 }
-/* ── Footer ── */
-.footer {
-  text-align:center; padding:16px; font-size:12px; color:#bbb;
+.settings-overlay.show { display:flex; }
+.settings-panel {
+  background:#fff; border-radius:16px; padding:24px; width:540px; max-width:92vw;
+  max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2);
 }
-.footer a { color:#bbb; text-decoration:none; }
-.footer a:hover { color:var(--primary); }
+.settings-panel h2 { font-size:18px; color:var(--text); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.settings-panel h3 { font-size:14px; color:var(--text); margin-bottom:10px; margin-top:16px; }
+.settings-close {
+  float:right; background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-light);
+}
+.settings-close:hover { color:var(--text); }
+.setting-section { margin-bottom:12px; }
+.setting-section label { font-size:13px; font-weight:600; color:var(--text); display:block; margin-bottom:4px; }
+.setting-section input, .setting-section select {
+  width:100%; padding:8px 10px; border:2px solid #e8e8e8; border-radius:8px;
+  font-size:14px; outline:none; font-family:inherit; margin-bottom:6px;
+}
+.setting-section input:focus { border-color:var(--primary); }
+.setting-row { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+.setting-row input { flex:1; margin-bottom:0; }
+.btn-sm { padding:6px 14px; font-size:12px; border-radius:6px; border:none; cursor:pointer; font-weight:600; font-family:inherit; white-space:nowrap; }
+.btn-red-sm { background:var(--primary); color:#fff; }
+.btn-red-sm:hover { opacity:0.9; }
+.btn-green-sm { background:var(--green); color:#fff; }
+.btn-green-sm:hover { opacity:0.9; }
+.btn-outline-sm { background:#fff; color:var(--primary); border:1.5px solid var(--primary); }
+.btn-outline-sm:hover { background:var(--red-bg); }
+.btn-ghost-sm { background:none; color:var(--text-light); border:none; }
+.btn-ghost-sm:hover { color:var(--primary); }
+.setting-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 10px; background:#fafafa; border-radius:8px; margin-bottom:4px; font-size:14px;
+}
+.setting-item .name { flex:1; }
+.setting-item .actions { display:flex; gap:4px; }
+.tag { display:inline-block; padding:1px 6px; border-radius:6px; font-size:11px; font-weight:600; }
+.tag-on { background:var(--green-bg); color:var(--green); }
+.tag-off { background:var(--red-bg); color:var(--red); }
+.login-hint { font-size:12px; color:var(--text-light); margin-top:8px; text-align:center; }
+.login-pwd-wrap { margin-bottom:12px; }
+.login-pwd-wrap input { width:100%; padding:10px; border:2px solid #e8e8e8; border-radius:8px; font-size:15px; outline:none; font-family:inherit; }
+.login-pwd-wrap input:focus { border-color:var(--primary); }
+.login-pwd-wrap .err { color:var(--red); font-size:13px; margin-top:4px; text-align:center; }
+.toast {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:9999;
+  background:#333; color:#fff; padding:10px 24px; border-radius:8px;
+  font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none;
+}
+.toast.show { opacity:1; }
+.toast.error { background:var(--red); }
 </style>
 </head>
 <body>
 <div class="container" id="app">
   <div class="header">
-    <h1>🍔 每日菜品报损</h1>
-    <p>请于每日 20:00 前完成填报</p>
+    <div class="header-left">
+      <h1>🍔 每日菜品报损</h1>
+      <p>请于每日 20:00 前完成填报</p>
+    </div>
+    <button class="settings-btn" onclick="openSettings()" title="管理设置">⚙️</button>
   </div>
   <div class="content-card">
     <div id="main-content"></div>
   </div>
-  <div class="footer">
-    数据仅用于内部管理 · 请如实填报<br>
-    <a href="/admin.html">🔑 管理入口</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 设置面板 -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-panel" id="settingsPanel">
+    <button class="settings-close" onclick="closeSettings()">✕</button>
+    <h2>⚙️ 管理设置</h2>
+    <div id="settingsBody">
+      <div class="login-pwd-wrap" id="settingsLogin">
+        <input type="password" id="settingsPwd" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')authSettings()">
+        <div class="err" id="settingsErr"></div>
+        <button class="btn btn-primary" style="padding:10px;font-size:14px;" onclick="authSettings()">验证</button>
+        <div class="login-hint">默认密码：admin123</div>
+      </div>
+      <div id="settingsContent" style="display:none;"></div>
+    </div>
   </div>
 </div>
 
 <script>
-const API = '';
-const TODAY = new Date().toISOString().split('T')[0];
+var API = '';
+var TODAY = new Date().toISOString().split('T')[0];
+var TOKEN = localStorage.getItem('fw_token') || '';
 
-let stores = [];
-let dishes = [];
-let quantities = {};
-let selectedStoreId = null;
-let alreadySubmitted = false;
-let submitting = false;
+var stores = [];
+var dishes = [];
+var quantities = {};
+var selectedStoreId = null;
+var submitting = false;
 
+function toast(msg, isError) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2000);
+}
+
+// ── 初始化 ──
 async function init() {
-  const main = document.getElementById('main-content');
+  var main = document.getElementById('main-content');
   main.innerHTML = '<div class="loading">加载中...</div>';
-
   try {
-    const [sRes, dRes] = await Promise.all([
+    var res = await Promise.all([
       fetch(API + '/api/stores'),
       fetch(API + '/api/dishes'),
     ]);
-    stores = await sRes.json();
-    dishes = await dRes.json();
-
+    stores = await res[0].json();
+    dishes = await res[1].json();
     if (stores.length === 0) {
       main.innerHTML = '<div class="error-box">暂无可选门店，请联系管理员配置。</div>';
       return;
@@ -153,133 +230,372 @@ async function init() {
       main.innerHTML = '<div class="error-box">暂无待填报菜品，请联系管理员配置。</div>';
       return;
     }
-
-    dishes.forEach(d => { quantities[d.id] = 0; });
+    dishes.forEach(function(d) { quantities[d.id] = 0; });
     renderForm();
   } catch (e) {
-    main.innerHTML = `<div class="error-box">加载失败：${e.message}<br>请检查网络后刷新页面</div>`;
+    main.innerHTML = '<div class="error-box">加载失败：' + e.message + '<br>请检查网络后刷新页面</div>';
   }
 }
 
-function renderForm(showAlready = false) {
-  const main = document.getElementById('main-content');
-
-  if (showAlready && selectedStoreId) {
-    main.innerHTML = `
-      <div class="already-submitted">
-        <div class="icon">✅</div>
-        <h2>今日已填报，谢谢</h2>
-        <p>门店「${stores.find(s => s.id === selectedStoreId)?.name || ''}」今日的报损数据已提交</p>
-        <p style="margin-top:16px;font-size:13px;color:var(--text-light);">如需修改请联系管理员</p>
-      </div>`;
-    return;
-  }
-
-  const storeOpts = stores.map(s =>
-    `<option value="${s.id}" ${s.id === selectedStoreId ? 'selected' : ''}>${s.name}</option>`
-  ).join('');
-
-  const dishItems = dishes.map(d => `
-    <div class="dish-item">
-      <span class="dish-name">${d.name}</span>
-      <div class="dish-input">
-        <button onclick="changeQty(${d.id}, -1)">−</button>
-        <input type="number" id="qty_${d.id}" value="${quantities[d.id]}" min="0"
-          onchange="onQtyChange(${d.id}, this.value)"
-          onfocus="this.select()">
-        <button onclick="changeQty(${d.id}, 1)">+</button>
-      </div>
-    </div>
-  `).join('');
-
-  main.innerHTML = `
-    <div class="form-group">
-      <label>🏪 选择门店</label>
-      <select id="storeSelect" onchange="onStoreChange(this.value)">
-        <option value="">-- 请选择门店 --</option>
-        ${storeOpts}
-      </select>
-    </div>
-    <div class="form-group">
-      <label>📋 菜品剩余数量</label>
-      <p style="font-size:12px;color:var(--text-light);margin-top:-4px;margin-bottom:8px;">剩余数量 = 当天卖剩下的 / 无法隔夜保存的</p>
-      <div class="dish-list">${dishItems}</div>
-    </div>
-    <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()" ${!selectedStoreId ? 'disabled' : ''}>
-      确认提交
-    </button>`;
+// ── 渲染表单 ──
+function renderForm() {
+  var main = document.getElementById('main-content');
+  var storeOpts = stores.map(function(s) {
+    return '<option value="' + s.id + '"' + (s.id === selectedStoreId ? ' selected' : '') + '>' + s.name + '</option>';
+  }).join('');
+  var dishItems = dishes.map(function(d) {
+    return '<div class="dish-item">' +
+      '<span class="dish-name">' + d.name + '</span>' +
+      '<div class="dish-input">' +
+        '<button onclick="changeQty(' + d.id + ',-1)">−</button>' +
+        '<input type="number" id="qty_' + d.id + '" value="' + (quantities[d.id]||0) + '" min="0" onchange="onQtyChange(' + d.id + ',this.value)" onfocus="this.select()">' +
+        '<button onclick="changeQty(' + d.id + ',1)">+</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  main.innerHTML =
+    '<div class="form-group">' +
+      '<label>🏪 选择门店</label>' +
+      '<select id="storeSelect" onchange="onStoreChange(this.value)">' +
+        '<option value="">-- 请选择门店 --</option>' + storeOpts +
+      '</select>' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label>📋 菜品剩余数量</label>' +
+      '<p style="font-size:12px;color:var(--text-light);margin-top:-4px;margin-bottom:8px;">剩余数量 = 当天卖剩下的 / 无法隔夜保存的</p>' +
+      '<div class="dish-list">' + dishItems + '</div>' +
+    '</div>' +
+    '<button class="btn btn-primary" id="btnSubmit" onclick="handleSubmit()"' + (!selectedStoreId ? ' disabled' : '') + '>确认提交</button>';
 }
 
+// ── 门店选择 ──
 async function onStoreChange(storeId) {
   selectedStoreId = storeId ? Number(storeId) : null;
   document.getElementById('btnSubmit').disabled = !selectedStoreId;
-
   if (!selectedStoreId) return;
-
   try {
-    const res = await fetch(API + '/api/check-submission?storeId=' + selectedStoreId + '&date=' + TODAY);
-    const { submitted } = await res.json();
-    alreadySubmitted = submitted;
-    if (submitted) renderForm(true);
+    var res = await fetch(API + '/api/check-submission?storeId=' + selectedStoreId + '&date=' + TODAY);
+    var data = await res.json();
+    if (data.submitted) {
+      // Show warning but still allow re-submit
+      toast('该门店今日已提交过，重新提交将覆盖');
+    }
   } catch (_) {}
 }
 
 function changeQty(dishId, delta) {
   quantities[dishId] = Math.max(0, (quantities[dishId] || 0) + delta);
-  const input = document.getElementById('qty_' + dishId);
-  if (input) input.value = quantities[dishId];
+  var inp = document.getElementById('qty_' + dishId);
+  if (inp) inp.value = quantities[dishId];
 }
-
 function onQtyChange(dishId, val) {
-  const n = parseInt(val, 10);
+  var n = parseInt(val, 10);
   quantities[dishId] = isNaN(n) || n < 0 ? 0 : n;
-  const input = document.getElementById('qty_' + dishId);
-  if (input) input.value = quantities[dishId];
+  var inp = document.getElementById('qty_' + dishId);
+  if (inp) inp.value = quantities[dishId];
 }
 
+// ── 提交 ──
 async function handleSubmit() {
   if (submitting || !selectedStoreId) return;
   submitting = true;
-  const btn = document.getElementById('btnSubmit');
+  var btn = document.getElementById('btnSubmit');
   btn.disabled = true;
   btn.textContent = '提交中...';
-
   try {
-    const storeName = stores.find(s => s.id === selectedStoreId)?.name || '';
-    const items = dishes.map(d => ({
-      dish_id: d.id,
-      dish_name: d.name,
-      quantity: quantities[d.id] || 0,
-    }));
-
-    const res = await fetch(API + '/api/submit', {
+    var storeName = '';
+    for (var i = 0; i < stores.length; i++) {
+      if (stores[i].id === selectedStoreId) { storeName = stores[i].name; break; }
+    }
+    var items = dishes.map(function(d) {
+      return { dish_id: d.id, dish_name: d.name, quantity: quantities[d.id] || 0 };
+    });
+    var res = await fetch(API + '/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         storeId: selectedStoreId,
-        storeName,
+        storeName: storeName,
         date: TODAY,
-        items,
+        items: items,
         submitTime: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
       }),
     });
-
-    const data = await res.json();
+    var data = await res.json();
     if (data.success) {
-      renderForm(true);
+      renderSuccess(storeName);
     } else {
       alert('提交失败：' + (data.error || '未知错误'));
-      btn.disabled = false;
-      btn.textContent = '确认提交';
+      btn.disabled = false; btn.textContent = '确认提交';
     }
   } catch (e) {
     alert('网络错误：' + e.message);
-    btn.disabled = false;
-    btn.textContent = '确认提交';
+    btn.disabled = false; btn.textContent = '确认提交';
   }
   submitting = false;
 }
 
+// ── 提交成功页（带返回按钮） ──
+function renderSuccess(storeName) {
+  var main = document.getElementById('main-content');
+  main.innerHTML =
+    '<div class="success-page">' +
+      '<div class="icon">✅</div>' +
+      '<h2>提交成功！</h2>' +
+      '<p>门店「' + storeName + '」<br>今日报损数据已提交</p>' +
+      '<button class="btn btn-primary" onclick="resetForm()">⬅ 返回修改</button>' +
+      '<button class="btn btn-secondary" onclick="resetForm()">继续填报其他门店</button>' +
+    '</div>';
+}
+
+// ── 返回重新填报 ──
+function resetForm() {
+  // Reset quantities
+  dishes.forEach(function(d) { quantities[d.id] = 0; });
+  selectedStoreId = null;
+  renderForm();
+}
+
+// ====================== 设置面板（管理后台） ======================
+
+function openSettings() {
+  document.getElementById('settingsOverlay').classList.add('show');
+  if (TOKEN) {
+    showSettingsContent();
+  } else {
+    document.getElementById('settingsLogin').style.display = 'block';
+    document.getElementById('settingsContent').style.display = 'none';
+    document.getElementById('settingsPwd').value = '';
+    document.getElementById('settingsErr').textContent = '';
+  }
+}
+
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('show');
+}
+
+// 点击遮罩关闭
+document.getElementById('settingsOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeSettings();
+});
+
+async function authSettings() {
+  var pwd = document.getElementById('settingsPwd').value;
+  var err = document.getElementById('settingsErr');
+  try {
+    var res = await fetch(API + '/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd }),
+    });
+    var data = await res.json();
+    if (data.success) {
+      TOKEN = data.token;
+      localStorage.setItem('fw_token', TOKEN);
+      showSettingsContent();
+    } else {
+      err.textContent = '密码错误';
+    }
+  } catch (e) {
+    err.textContent = '验证失败：' + e.message;
+  }
+}
+
+async function api(url, opts) {
+  opts = opts || {};
+  var headers = Object.assign({}, opts.headers || {});
+  if (TOKEN) headers['x-admin-token'] = TOKEN;
+  var res = await fetch(API + url, Object.assign({}, opts, { headers: headers }));
+  if (res.status === 401) {
+    TOKEN = ''; localStorage.removeItem('fw_token');
+    document.getElementById('settingsLogin').style.display = 'block';
+    document.getElementById('settingsContent').style.display = 'none';
+    throw new Error('登录已过期');
+  }
+  var data = await res.json();
+  if (!res.ok) throw new Error(data.error || '请求失败');
+  return data;
+}
+
+async function showSettingsContent() {
+  document.getElementById('settingsLogin').style.display = 'none';
+  var c = document.getElementById('settingsContent');
+  c.style.display = 'block';
+  c.innerHTML = '<div class="loading">加载中...</div>';
+
+  try {
+    var storeList = await api('/api/admin/stores');
+    var dishList = await api('/api/admin/dishes');
+
+    var storeItems = storeList.map(function(s) {
+      return '<div class="setting-item">' +
+        '<span class="name">' + s.name + ' <span class="tag ' + (s.active?'tag-on':'tag-off') + '">' + (s.active?'启用':'停用') + '</span></span>' +
+        '<span class="actions">' +
+          '<button class="btn btn-outline-sm btn-sm" onclick="editSettingStore(' + s.id + ')">编辑</button>' +
+          '<button class="btn btn-outline-sm btn-sm" onclick="toggleSettingStore(' + s.id + ')">' + (s.active?'停用':'启用') + '</button>' +
+          '<button class="btn btn-ghost-sm btn-sm" onclick="deleteSettingStore(' + s.id + ')">删除</button>' +
+        '</span>' +
+      '</div>';
+    }).join('');
+
+    var dishItems = dishList.map(function(d) {
+      return '<div class="setting-item">' +
+        '<span class="name">' + d.name + ' <span class="tag ' + (d.active?'tag-on':'tag-off') + '">' + (d.active?'启用':'停用') + '</span></span>' +
+        '<span class="actions">' +
+          '<button class="btn btn-outline-sm btn-sm" onclick="editSettingDish(' + d.id + ')">编辑</button>' +
+          '<button class="btn btn-outline-sm btn-sm" onclick="toggleSettingDish(' + d.id + ')">' + (d.active?'停用':'启用') + '</button>' +
+          '<button class="btn btn-ghost-sm btn-sm" onclick="deleteSettingDish(' + d.id + ')">删除</button>' +
+        '</span>' +
+      '</div>';
+    }).join('');
+
+    c.innerHTML =
+      // ── 门店管理 ──
+      '<h3>🏪 门店管理</h3>' +
+      '<div class="setting-section">' +
+        '<div class="setting-row">' +
+          '<input id="newStoreInput" placeholder="新门店名称" onkeydown="if(event.key===\'Enter\')addSettingStore()">' +
+          '<button class="btn btn-red-sm btn-sm" onclick="addSettingStore()">新增门店</button>' +
+        '</div>' +
+        (storeItems || '<div style="color:#999;font-size:13px;">暂无门店</div>') +
+      '</div>' +
+      // ── 菜品管理 ──
+      '<h3>🍆 菜品管理</h3>' +
+      '<div class="setting-section">' +
+        '<div class="setting-row">' +
+          '<input id="newDishInput" placeholder="新菜品名称" onkeydown="if(event.key===\'Enter\')addSettingDish()">' +
+          '<button class="btn btn-green-sm btn-sm" onclick="addSettingDish()">新增菜品</button>' +
+        '</div>' +
+        (dishItems || '<div style="color:#999;font-size:13px;">暂无菜品</div>') +
+      '</div>' +
+      '<div style="margin-top:16px;text-align:center;">' +
+        '<button class="btn btn-outline-sm btn-sm" onclick="refreshSettings()">🔄 刷新</button>' +
+        '<button class="btn btn-ghost-sm btn-sm" onclick="closeSettings()" style="margin-left:8px;">关闭</button>' +
+      '</div>';
+
+    window._storeList = storeList;
+    window._dishList = dishList;
+  } catch (e) {
+    c.innerHTML = '<div style="color:var(--red);text-align:center;">加载失败：' + e.message + '</div>';
+  }
+}
+
+function refreshSettings() { showSettingsContent(); }
+
+// ── 门店操作 ──
+async function addSettingStore() {
+  var inp = document.getElementById('newStoreInput');
+  var name = inp.value.trim();
+  if (!name) return toast('请输入门店名称');
+  try {
+    await api('/api/admin/stores', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name }),
+    });
+    inp.value = ''; toast('添加成功'); showSettingsContent();
+    refreshStores();
+  } catch (e) { toast('添加失败：' + e.message, true); }
+}
+
+function editSettingStore(id) {
+  var store = window._storeList.find(function(s) { return s.id === id; });
+  if (!store) return;
+  var newName = prompt('修改门店名称：', store.name);
+  if (newName && newName.trim()) {
+    saveSettingStore(id, newName.trim());
+  }
+}
+
+async function saveSettingStore(id, name) {
+  try {
+    await api('/api/admin/stores/' + id, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name }),
+    });
+    toast('修改成功'); showSettingsContent();
+    refreshStores();
+  } catch (e) { toast('修改失败：' + e.message, true); }
+}
+
+async function toggleSettingStore(id) {
+  try {
+    await api('/api/admin/stores/' + id + '/toggle', { method: 'PUT' });
+    toast('状态已切换'); showSettingsContent();
+    refreshStores();
+  } catch (e) { toast('操作失败：' + e.message, true); }
+}
+
+async function deleteSettingStore(id) {
+  var store = window._storeList.find(function(s) { return s.id === id; });
+  if (!store) return;
+  if (!confirm('确定要删除门店「' + store.name + '」吗？历史记录保留。')) return;
+  try {
+    await api('/api/admin/stores/' + id, { method: 'DELETE' });
+    toast('已删除'); showSettingsContent();
+    refreshStores();
+  } catch (e) { toast('删除失败：' + e.message, true); }
+}
+
+// ── 菜品操作 ──
+async function addSettingDish() {
+  var inp = document.getElementById('newDishInput');
+  var name = inp.value.trim();
+  if (!name) return toast('请输入菜品名称');
+  try {
+    await api('/api/admin/dishes', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name }),
+    });
+    inp.value = ''; toast('添加成功'); showSettingsContent();
+  } catch (e) { toast('添加失败：' + e.message, true); }
+}
+
+function editSettingDish(id) {
+  var dish = window._dishList.find(function(d) { return d.id === id; });
+  if (!dish) return;
+  var newName = prompt('修改菜品名称：', dish.name);
+  if (newName && newName.trim()) {
+    saveSettingDish(id, newName.trim());
+  }
+}
+
+async function saveSettingDish(id, name) {
+  try {
+    await api('/api/admin/dishes/' + id, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name }),
+    });
+    toast('修改成功'); showSettingsContent();
+  } catch (e) { toast('修改失败：' + e.message, true); }
+}
+
+async function toggleSettingDish(id) {
+  try {
+    await api('/api/admin/dishes/' + id + '/toggle', { method: 'PUT' });
+    toast('状态已切换'); showSettingsContent();
+  } catch (e) { toast('操作失败：' + e.message, true); }
+}
+
+async function deleteSettingDish(id) {
+  var dish = window._dishList.find(function(d) { return d.id === id; });
+  if (!dish) return;
+  if (!confirm('确定删除菜品「' + dish.name + '」吗？')) return;
+  try {
+    await api('/api/admin/dishes/' + id, { method: 'DELETE' });
+    toast('已删除'); showSettingsContent();
+  } catch (e) { toast('删除失败：' + e.message, true); }
+}
+
+// ── 刷新门店下拉 ──
+async function refreshStores() {
+  try {
+    var res = await fetch(API + '/api/stores');
+    stores = await res.json();
+    if (renderForm) renderForm();
+  } catch (_) {}
+}
+
+// ── 启动 ──
 init();
 </script>
 </body>
