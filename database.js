@@ -51,8 +51,8 @@ function initDb() {
   if (storeCount === 0) {
     const insertStore = db.prepare('INSERT INTO stores (name, sort_order) VALUES (?, ?)');
     const stores = [
-      '绿岛花园店', '石岩主场店', '大朗/牛陂店', '横岗店',
-      '绿荷/育儿店', '科茗店', '体育馆店'
+      '绿岛花园店', '石岩主场店', '大朗犀牛坡店', '横岗新世界店',
+      '松山湖绿荷居店', '松山湖科苑店', '大朗体育馆店'
     ];
     const tx = db.transaction(() => {
       stores.forEach((s, i) => insertStore.run(s, i));

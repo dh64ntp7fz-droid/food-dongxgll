@@ -160,13 +160,19 @@ app.get('/api/check-submission', (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/submit', (req, res) => {
+app.post('/api/submit', async (req, res) => {
   try {
     const { storeId, storeName, date, items, submitTime } = req.body;
     if (!storeId || !date || !items || items.length === 0) {
       return res.status(400).json({ error: '缺少必要参数：storeId, date, items' });
     }
     db.submitReport(storeId, storeName, date, JSON.stringify(items), submitTime);
+    // 发提交通知到群（异步，不影响响应）
+    const wh = getWebhookUrl();
+    if (wh) {
+      const total = items.reduce((s, i) => s + (i.quantity || 0), 0);
+      sendWecomMsg(wh, '✅ ' + storeName + ' 已提交不能隔夜菜品数据（剩余共' + total + '份）');
+    }
     res.json({ success: true, message: '提交成功！' });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
