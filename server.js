@@ -172,7 +172,7 @@ app.post('/api/submit', async (req, res) => {
     if (wh) {
       let msg = '✅ ' + storeName + ' 已提交\n───────────\n';
       items.forEach(function(i) {
-        msg += i.dish_name + '：' + (i.quantity || 0) + '份\n';
+        if (i.quantity) msg += i.dish_name + '：' + i.quantity + '份\n';
       });
       const total = items.reduce((s, i) => s + (i.quantity || 0), 0);
       msg += '───────────\n剩余共' + total + '份';
