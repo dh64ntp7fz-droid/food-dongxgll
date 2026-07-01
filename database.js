@@ -1,16 +1,23 @@
-const { createClient } = require('@libsql/client');
+const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
-// Turso 浜戠 SQLite锛堢敓浜х幆澧冿級鎴栨湰鍦?libsql锛堝紑鍙戠幆澧冿級
-const DB_URL = process.env.TURSO_DATABASE_URL || 'file:' + path.join(__dirname, 'data', 'food-waste.db');
-const DB_TOKEN = process.env.TURSO_AUTH_TOKEN || '';
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data', 'food-waste.db');
 
-const client = createClient({ url: DB_URL, authToken: DB_TOKEN });
+// 纭繚 data 鐩綍瀛樺湪
+const dataDir = path.dirname(DB_PATH);
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+
+let db;
 
 // ===================== 鍒濆鍖?=====================
 
-async function initDb() {
-  await client.executeMultiple(`
+function initDb() {
+  db = new Database(DB_PATH);
+  db.pragma('journal_mode = WAL');
+  db.pragma('foreign_keys = ON');
+
+  db.exec(`
     CREATE TABLE IF NOT EXISTS stores (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
@@ -18,14 +25,12 @@ async function initDb() {
       active INTEGER NOT NULL DEFAULT 1,
       sort_order INTEGER NOT NULL DEFAULT 0
     );
-
     CREATE TABLE IF NOT EXISTS dishes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
       active INTEGER NOT NULL DEFAULT 1,
       sort_order INTEGER NOT NULL DEFAULT 0
     );
-
     CREATE TABLE IF NOT EXISTS submissions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       store_id INTEGER NOT NULL,
@@ -35,125 +40,127 @@ async function initDb() {
       submit_time TEXT NOT NULL,
       FOREIGN KEY (store_id) REFERENCES stores(id)
     );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_store_date ON submissions(store_id, date);
   `);
 
-  // 鍞竴绱㈠紩锛圕REATE INDEX IF NOT EXISTS 鐢ㄨ€佸啓娉曪級
-  try {
-    await client.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_store_date ON submissions(store_id, date)');
-  } catch (_) {}
-
-  // 绉嶅瓙鏁版嵁
-  const storeCount = (await client.execute('SELECT COUNT(*) as cnt FROM stores')).rows[0].cnt;
+  // 绉嶅瓙鏁版嵁锛氬彧鍦ㄧ┖琛ㄦ椂鎻掑叆锛堥伩鍏嶈鐩栫敤鎴锋暟鎹級
+  const storeCount = db.prepare('SELECT COUNT(*) as cnt FROM stores').get().cnt;
   if (storeCount === 0) {
-    const stores = ['鎬诲簵','涓€鍒嗗簵','浜屽垎搴?,'涓夊垎搴?,'鍥涘垎搴?,'浜斿垎搴?,'鍏垎搴?,'涓冨垎搴?,'鍏垎搴?,'涔濆垎搴?];
-    for (let i = 0; i < stores.length; i++) {
-      await client.execute('INSERT INTO stores (name, sort_order, webhook_url) VALUES (?, ?, ?)', [stores[i], i, '']);
-    }
+    const insertStore = db.prepare('INSERT INTO stores (name, sort_order, webhook_url) VALUES (?, ?, ?)');
+    const stores = [
+      '缁垮矝鑺卞洯搴?, '鐭冲博涓诲満搴?, '澶ф湕鐘€鐗涘潯搴?, '妯矖搴?,
+      '缁胯嵎/鑲插効搴?, '绉戣嫅搴?, '浣撹偛棣嗗簵'
+    ];
+    const tx = db.transaction(() => {
+      stores.forEach((s, i) => insertStore.run(s, i, ''));
+    });
+    tx();
   }
-  const dishCount = (await client.execute('SELECT COUNT(*) as cnt FROM dishes')).rows[0].cnt;
+
+  const dishCount = db.prepare('SELECT COUNT(*) as cnt FROM dishes').get().cnt;
   if (dishCount === 0) {
-    const dishes = ['绾㈢儳鑲?,'绯栭唻鎺掗','娓呰捀椴堥奔','瀹繚楦′竵','楹诲﹩璞嗚厫','鍥為攨鑲?,'姘寸叜楸?,'骞茬吀鍥涘璞?,'楸奸鑲変笣','瑗跨孩鏌跨倰铔?,'閰歌荆鍦熻眴涓?,'钂滆搲瑗垮叞鑺?,'绾㈢儳鑼勫瓙','浜叡鑲変笣','閿呭寘鑲?];
-    for (let i = 0; i < dishes.length; i++) {
-      await client.execute('INSERT INTO dishes (name, sort_order) VALUES (?, ?)', [dishes[i], i]);
-    }
+    const insertDish = db.prepare('INSERT INTO dishes (name, sort_order) VALUES (?, ?)');
+    const dishes = [
+      '绾㈢儳鑲?,'绯栭唻鎺掗','娓呰捀椴堥奔','瀹繚楦′竵','楹诲﹩璞嗚厫',
+      '鍥為攨鑲?,'姘寸叜楸?,'骞茬吀鍥涘璞?,'楸奸鑲変笣','瑗跨孩鏌跨倰铔?,
+      '閰歌荆鍦熻眴涓?,'钂滆搲瑗垮叞鑺?,'绾㈢儳鑼勫瓙','浜叡鑲変笣','閿呭寘鑲?
+    ];
+    const tx = db.transaction(() => {
+      dishes.forEach((d, i) => insertDish.run(d, i));
+    });
+    tx();
   }
+
+  console.log(`[DB] 鏁版嵁搴撳氨缁? ${DB_PATH}`);
+  return db;
 }
 
 // ===================== Stores =====================
 
-async function getActiveStores() {
-  const r = await client.execute('SELECT id, name FROM stores WHERE active = 1 ORDER BY sort_order');
-  return r.rows;
+function getActiveStores() {
+  return db.prepare('SELECT id, name FROM stores WHERE active = 1 ORDER BY sort_order').all();
 }
 
-async function getAllStores() {
-  const r = await client.execute('SELECT * FROM stores ORDER BY sort_order');
-  return r.rows;
+function getAllStores() {
+  return db.prepare('SELECT * FROM stores ORDER BY sort_order').all();
 }
 
-async function addStore(name, webhookUrl = '') {
-  const max = (await client.execute('SELECT MAX(sort_order) as m FROM stores')).rows[0]?.m || 0;
-  const r = await client.execute('INSERT INTO stores (name, webhook_url, sort_order) VALUES (?, ?, ?)', [name, webhookUrl, max + 1]);
-  return { lastInsertRowid: Number(r.lastInsertRowid) };
+function addStore(name, webhookUrl = '') {
+  const max = db.prepare('SELECT MAX(sort_order) as m FROM stores').get()?.m || 0;
+  return db.prepare('INSERT INTO stores (name, webhook_url, sort_order) VALUES (?, ?, ?)').run(name, webhookUrl, max + 1);
 }
 
-async function updateStore(id, name) {
-  return client.execute('UPDATE stores SET name = ? WHERE id = ?', [name, id]);
+function updateStore(id, name) {
+  return db.prepare('UPDATE stores SET name = ? WHERE id = ?').run(name, id);
 }
 
-async function updateStoreWebhook(id, webhookUrl) {
-  return client.execute('UPDATE stores SET webhook_url = ? WHERE id = ?', [webhookUrl, id]);
+function updateStoreWebhook(id, webhookUrl) {
+  return db.prepare('UPDATE stores SET webhook_url = ? WHERE id = ?').run(webhookUrl, id);
 }
 
-async function toggleStore(id) {
-  const s = (await client.execute('SELECT active FROM stores WHERE id = ?', [id])).rows[0];
-  return client.execute('UPDATE stores SET active = ? WHERE id = ?', [s?.active ? 0 : 1, id]);
+function toggleStore(id) {
+  const s = db.prepare('SELECT active FROM stores WHERE id = ?').get(id);
+  return db.prepare('UPDATE stores SET active = ? WHERE id = ?').run(s?.active ? 0 : 1, id);
 }
 
-async function deleteStore(id) {
-  return client.execute('DELETE FROM stores WHERE id = ?', [id]);
+function deleteStore(id) {
+  return db.prepare('DELETE FROM stores WHERE id = ?').run(id);
 }
 
 // ===================== Dishes =====================
 
-async function getActiveDishes() {
-  const r = await client.execute('SELECT id, name FROM dishes WHERE active = 1 ORDER BY sort_order');
-  return r.rows;
+function getActiveDishes() {
+  return db.prepare('SELECT id, name FROM dishes WHERE active = 1 ORDER BY sort_order').all();
 }
 
-async function getAllDishes() {
-  const r = await client.execute('SELECT * FROM dishes ORDER BY sort_order');
-  return r.rows;
+function getAllDishes() {
+  return db.prepare('SELECT * FROM dishes ORDER BY sort_order').all();
 }
 
-async function addDish(name) {
-  const max = (await client.execute('SELECT MAX(sort_order) as m FROM dishes')).rows[0]?.m || 0;
-  const r = await client.execute('INSERT INTO dishes (name, sort_order) VALUES (?, ?)', [name, max + 1]);
-  return { lastInsertRowid: Number(r.lastInsertRowid) };
+function addDish(name) {
+  const max = db.prepare('SELECT MAX(sort_order) as m FROM dishes').get()?.m || 0;
+  return db.prepare('INSERT INTO dishes (name, sort_order) VALUES (?, ?)').run(name, max + 1);
 }
 
-async function updateDish(id, name) {
-  return client.execute('UPDATE dishes SET name = ? WHERE id = ?', [name, id]);
+function updateDish(id, name) {
+  return db.prepare('UPDATE dishes SET name = ? WHERE id = ?').run(name, id);
 }
 
-async function toggleDish(id) {
-  const d = (await client.execute('SELECT active FROM dishes WHERE id = ?', [id])).rows[0];
-  return client.execute('UPDATE dishes SET active = ? WHERE id = ?', [d?.active ? 0 : 1, id]);
+function toggleDish(id) {
+  const d = db.prepare('SELECT active FROM dishes WHERE id = ?').get(id);
+  return db.prepare('UPDATE dishes SET active = ? WHERE id = ?').run(d?.active ? 0 : 1, id);
 }
 
-async function deleteDish(id) {
-  return client.execute('DELETE FROM dishes WHERE id = ?', [id]);
+function deleteDish(id) {
+  return db.prepare('DELETE FROM dishes WHERE id = ?').run(id);
 }
 
 // ===================== Submissions =====================
 
-async function submitReport(storeId, storeName, date, items, submitTime) {
-  return client.execute(
-    `INSERT OR REPLACE INTO submissions (store_id, store_name, date, items, submit_time) VALUES (?, ?, ?, ?, ?)`,
-    [storeId, storeName, date, items, submitTime]
-  );
+function submitReport(storeId, storeName, date, items, submitTime) {
+  return db.prepare(
+    'INSERT OR REPLACE INTO submissions (store_id, store_name, date, items, submit_time) VALUES (?, ?, ?, ?, ?)'
+  ).run(storeId, storeName, date, items, submitTime);
 }
 
-async function getSubmission(storeId, date) {
-  const r = await client.execute('SELECT * FROM submissions WHERE store_id = ? AND date = ?', [storeId, date]);
-  return r.rows[0] || null;
+function getSubmission(storeId, date) {
+  return db.prepare('SELECT * FROM submissions WHERE store_id = ? AND date = ?').get(storeId, date);
 }
 
-async function getTodaySubmissions(date) {
-  const r = await client.execute('SELECT * FROM submissions WHERE date = ?', [date]);
-  return r.rows;
+function getTodaySubmissions(date) {
+  return db.prepare('SELECT * FROM submissions WHERE date = ?').all(date);
 }
 
-async function getTodaySummary(date) {
-  const submitted = await getTodaySubmissions(date);
-  const allActive = await getActiveStores();
+function getTodaySummary(date) {
+  const submitted = getTodaySubmissions(date);
+  const allActive = getActiveStores();
   const submittedIds = new Set(submitted.map(s => s.store_id));
   const notSubmitted = allActive.filter(s => !submittedIds.has(s.id));
   return { submitted, notSubmitted, allStores: allActive };
 }
 
 module.exports = {
-  initDb, client,
+  initDb,
   getActiveStores, getAllStores,
   addStore, updateStore, toggleStore, deleteStore, updateStoreWebhook,
   getActiveDishes, getAllDishes,
