@@ -1,8 +1,10 @@
 services:
   - type: web
-    name: food-waste
+    name: food-dongxgll
     env: node
-    buildCommand: npm install && node -e "require('./database').initDb()"
+    region: singapore
+    plan: free
+    buildCommand: npm install
     startCommand: node server.js
     envVars:
       - key: PORT
