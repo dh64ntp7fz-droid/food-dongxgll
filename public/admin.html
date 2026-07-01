@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鍚庡彴绠＄悊 路 鑿滃搧鎶ユ崯</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f0f2f5; min-height: 100vh;
+  }
+  .login-wrap {
+    display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+  }
+  .login-box {
+    background: #fff; padding: 40px 32px; border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 380px;
+  }
+  .login-box h2 { text-align: center; margin-bottom: 8px; font-size: 21px; color: #333; }
+  .login-box .sub { text-align: center; font-size: 13px; color: #999; margin-bottom: 28px; }
+  .login-box input {
+    width: 100%; padding: 11px 14px; font-size: 15px; border: 1.5px solid #ddd;
+    border-radius: 8px; margin-bottom: 16px;
+  }
+  .login-box input:focus { outline: none; border-color: #e74c3c; }
+  .login-box button {
+    width: 100%; padding: 12px; font-size: 16px; font-weight: 600;
+    background: #e74c3c; color: #fff; border: none; border-radius: 8px; cursor: pointer;
+  }
+  .login-box button:hover { background: #c0392b; }
+  .login-box .err { color: #e74c3c; font-size: 13px; text-align: center; margin-top: 12px; }
+
+  .admin-wrap { display: none; }
+  .topbar {
+    background: #fff; padding: 0 24px; height: 56px; display: flex;
+    align-items: center; justify-content: space-between;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 10;
+  }
+  .topbar h1 { font-size: 17px; color: #333; }
+  .topbar .logout { font-size: 13px; color: #e74c3c; cursor: pointer; }
+  .topbar .logout:hover { text-decoration: underline; }
+
+  .tabs {
+    display: flex; gap: 0; background: #fff; border-bottom: 1px solid #eee; padding: 0 24px;
+  }
+  .tab {
+    padding: 14px 20px; font-size: 14px; color: #666; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.15s;
+  }
+  .tab:hover { color: #333; }
+  .tab.active { color: #e74c3c; border-bottom-color: #e74c3c; font-weight: 600; }
+
+  .panel { padding: 24px; max-width: 960px; }
+
+  .card {
+    background: #fff; border-radius: 10px; padding: 20px 24px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05); margin-bottom: 16px;
+  }
+  .card h3 { font-size: 15px; color: #333; margin-bottom: 16px; }
+
+  .add-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .add-row input {
+    flex: 1; padding: 9px 12px; font-size: 14px; border: 1.5px solid #ddd; border-radius: 6px;
+  }
+  .add-row input:focus { outline: none; border-color: #e74c3c; }
+  .btn { padding: 8px 16px; font-size: 13px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+  .btn-red { background: #e74c3c; color: #fff; }
+  .btn-red:hover { background: #c0392b; }
+  .btn-green { background: #27ae60; color: #fff; }
+  .btn-green:hover { background: #219a52; }
+  .btn-outline { background: #fff; color: #e74c3c; border: 1.5px solid #e74c3c; }
+  .btn-outline:hover { background: #fff5f5; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-ghost { background: transparent; color: #999; border: none; }
+  .btn-ghost:hover { color: #e74c3c; }
+
+  .list-table { width: 100%; border-collapse: collapse; }
+  .list-table th, .list-table td {
+    text-align: left; padding: 10px 12px; font-size: 14px; border-bottom: 1px solid #f5f5f5;
+  }
+  .list-table th { font-weight: 600; color: #999; font-size: 12px; }
+  .list-table .actions { text-align: right; white-space: nowrap; }
+  .list-table .actions button { margin-left: 4px; }
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+  }
+  .tag-on { background: #e8f5e9; color: #27ae60; }
+  .tag-off { background: #fbe9e7; color: #e74c3c; }
+
+  .edit-inline input, .edit-inline textarea {
+    width: 100%; padding: 6px 8px; font-size: 13px; border: 1.5px solid #e74c3c;
+    border-radius: 4px; outline: none; font-family: inherit;
+  }
+  .edit-inline textarea { resize: vertical; min-height: 36px; }
+  .wh-cell { max-width: 220px; }
+  .wh-url {
+    display: block; max-width: 200px; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; font-size: 12px; color: #666;
+  }
+  .wh-none { font-size: 12px; color: #ccc; }
+
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .summary-grid { grid-template-columns: 1fr; } }
+  .summary-card { background: #fff; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+  .summary-card h3 { font-size: 15px; margin-bottom: 12px; }
+  .store-tag {
+    display: inline-block; padding: 6px 12px; border-radius: 6px;
+    font-size: 13px; margin: 4px 4px 4px 0;
+  }
+  .store-tag.ok { background: #e8f5e9; color: #27ae60; }
+  .store-tag.miss { background: #fbe9e7; color: #e74c3c; border: 1px dashed #e74c3c; }
+
+  .report-box {
+    background: #fff; border-radius: 10px; padding: 20px 24px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05); margin-top: 16px;
+  }
+  .report-box h3 { font-size: 15px; margin-bottom: 12px; }
+  .report-text {
+    background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px;
+    padding: 16px; font-size: 14px; line-height: 1.8; white-space: pre-wrap;
+    color: #333; margin-bottom: 12px;
+  }
+  .btn-copy { padding: 8px 20px; }
+
+  .empty { text-align: center; color: #bbb; padding: 40px; font-size: 14px; }
+  .loading { text-align: center; color: #999; padding: 40px; }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: #333; color: #fff; padding: 10px 24px; border-radius: 8px;
+    font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="login-wrap" id="loginPage">
+    <div class="login-box">
+      <h2>馃敡 鍚庡彴绠＄悊</h2>
+      <div class="sub">鑿滃搧鎶ユ崯绯荤粺 路 绠＄悊鑰呭叆鍙?/div>
+      <input type="password" id="pwdInput" placeholder="璇疯緭鍏ョ鐞嗗瘑鐮? onkeydown="if(event.key==='Enter')doLogin()">
+      <button onclick="doLogin()">鐧?褰?/button>
+      <div class="err" id="loginErr"></div>
+    </div>
+  </div>
+
+  <div class="admin-wrap" id="adminPage">
+    <div class="topbar">
+      <h1>馃敡 鑿滃搧鎶ユ崯 路 鍚庡彴绠＄悊</h1>
+      <span class="logout" onclick="doLogout()">閫€鍑虹櫥褰?/span>
+    </div>
+    <div class="tabs">
+      <div class="tab active" data-tab="summary" onclick="switchTab('summary')">馃搳 浠婃棩姹囨€?/div>
+      <div class="tab" data-tab="stores" onclick="switchTab('stores')">馃彧 闂ㄥ簵 & 浼佸井鏈哄櫒浜?/div>
+      <div class="tab" data-tab="dishes" onclick="switchTab('dishes')">馃嵆 鑿滃搧绠＄悊</div>
+    </div>
+    <div class="panel" id="tabContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+let TOKEN = localStorage.getItem('fw_token') || '';
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+async function api(url, opts = {}) {
+  const headers = { ...opts.headers };
+  if (TOKEN) headers['x-admin-token'] = TOKEN;
+  const res = await fetch(API + url, { ...opts, headers });
+  if (res.status === 401) { doLogout(); throw new Error('鐧诲綍宸茶繃鏈?); }
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || '璇锋眰澶辫触');
+  return data;
+}
+
+// ===== 鐧诲綍/鐧诲嚭 =====
+async function doLogin() {
+  const pwd = document.getElementById('pwdInput').value;
+  const err = document.getElementById('loginErr');
+  err.textContent = '';
+  try {
+    const res = await fetch(API + '/api/admin/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      TOKEN = data.token;
+      localStorage.setItem('fw_token', TOKEN);
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('adminPage').style.display = 'block';
+      switchTab('summary');
+    } else { err.textContent = '瀵嗙爜閿欒'; }
+  } catch (e) { err.textContent = '鐧诲綍澶辫触锛? + e.message; }
+}
+
+function doLogout() {
+  TOKEN = '';
+  localStorage.removeItem('fw_token');
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('adminPage').style.display = 'none';
+  document.getElementById('pwdInput').value = '';
+}
+
+if (TOKEN) {
+  (async () => {
+    try { await api('/api/admin/verify');
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('adminPage').style.display = 'block';
+      switchTab('summary');
+    } catch (_) { doLogout(); }
+  })();
+}
+
+// ===== Tab =====
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
+  document.getElementById('tabContent').innerHTML = '<div class="loading">鍔犺浇涓€?/div>';
+  if (name === 'summary') renderSummary();
+  else if (name === 'stores') renderStores();
+  else if (name === 'dishes') renderDishes();
+}
+
+// ===== 姹囨€?=====
+async function renderSummary() {
+  const c = document.getElementById('tabContent');
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const s = await api('/api/admin/summary?date=' + today);
+
+    const subTags = s.submitted.length
+      ? s.submitted.map(x => `<span class="store-tag ok">鉁?${x.store_name}<br><small style="opacity:0.7">${x.submit_time}</small></span>`).join('')
+      : '<div style="color:#999;font-size:13px">鏆傛棤</div>';
+
+    const missTags = s.notSubmitted.length
+      ? s.notSubmitted.map(x => `<span class="store-tag miss">鉂?${x.name}</span>`).join('')
+      : '<div style="color:#27ae60;font-size:13px">鍏ㄩ儴宸叉彁浜?馃帀</div>';
+
+    let rt = '';
+    try { rt = (await api('/api/admin/report-text?date=' + today)).text; } catch (_) {}
+
+    c.innerHTML = `<div class="summary-grid">
+      <div class="summary-card"><h3>鉁?宸叉彁浜ら棬搴楋紙${s.submitted.length}/${s.allStores.length}锛?/h3>${subTags}</div>
+      <div class="summary-card" style="${s.notSubmitted.length?'border:2px solid #e74c3c':''}">
+        <h3 style="${s.notSubmitted.length?'color:#e74c3c':''}">鉂?鏈彁浜ら棬搴楋紙${s.notSubmitted.length}锛?/h3>${missTags}
+      </div>
+    </div>
+    <div class="report-box">
+      <h3>馃搵 浼佷笟寰俊缇ゅ彂鏂囨锛堝彲鐩存帴澶嶅埗绮樿创锛?/h3>
+      <div class="report-text">${rt}</div>
+      <button class="btn btn-red btn-copy" onclick="copyReport()">馃搵 涓€閿鍒?/button>
+    </div>`;
+    window._rt = rt;
+  } catch (e) { c.innerHTML = `<div class="card"><div class="empty">鍔犺浇澶辫触锛?{e.message}</div></div>`; }
+}
+
+function copyReport() {
+  if (!window._rt) return;
+  navigator.clipboard.writeText(window._rt).then(() => toast('宸插鍒?), () => {
+    const ta = document.createElement('textarea'); ta.value = window._rt;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    toast('宸插鍒?);
+  });
+}
+
+// ===== 闂ㄥ簵绠＄悊锛堝惈 Webhook锛?====
+async function renderStores() {
+  const c = document.getElementById('tabContent');
+  try {
+    const stores = await api('/api/admin/stores');
+    const rows = stores.map(s => {
+      const wh = s.webhook_url || '';
+      return `<tr>
+        <td>${s.id}</td>
+        <td id="sn-${s.id}">${s.name}</td>
+        <td class="wh-cell" id="sw-${s.id}">
+          ${wh ? `<span class="wh-url" title="${wh}">${wh}</span>` : '<span class="wh-none">鏈厤缃?/span>'}
+        </td>
+        <td><span class="tag ${s.active?'tag-on':'tag-off'}">${s.active?'鍚敤':'鍋滅敤'}</span></td>
+        <td class="actions">
+          <button class="btn btn-outline btn-sm" onclick="editStore(${s.id},'${s.name.replace(/'/g,"\\'")}')">缂栬緫</button>
+          <button class="btn btn-outline btn-sm" onclick="editWebhook(${s.id},'${(wh||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">馃Webhook</button>
+          <button class="btn btn-outline btn-sm" onclick="testWebhook(${s.id})" ${wh?'':'disabled'}>娴嬭瘯</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleStore(${s.id})">${s.active?'鍋滅敤':'鍚敤'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteStore(${s.id},'${s.name.replace(/'/g,"\\'")}')">鍒犻櫎</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    c.innerHTML = `<div class="card">
+      <h3>馃彧 闂ㄥ簵鍒楄〃 & 浼佷笟寰俊鏈哄櫒浜?/h3>
+      <p style="font-size:12px;color:#999;margin-bottom:12px;">
+        姣忓簵鍙厤缃竴涓紒寰満鍣ㄤ汉 Webhook 鍦板潃銆傞厤缃悗锛屾眹鎬婚€氱煡鍙嚜鍔ㄦ帹閫佸埌瀵瑰簲闂ㄥ簵缇ゃ€?      </p>
+      <div class="add-row">
+        <input id="newStoreName" placeholder="杈撳叆鏂伴棬搴楀悕绉? onkeydown="if(event.key==='Enter')addStore()">
+        <button class="btn btn-red" onclick="addStore()">娣诲姞闂ㄥ簵</button>
+      </div>
+      <table class="list-table">
+        <thead><tr><th>ID</th><th>鍚嶇О</th><th class="wh-cell">浼佸井Webhook</th><th>鐘舵€?/th><th class="actions">鎿嶄綔</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="5" class="empty">鏆傛棤闂ㄥ簵</td></tr>'}</tbody>
+      </table>
+    </div>`;
+    window._stores = stores;
+  } catch (e) { c.innerHTML = `<div class="card"><div class="empty">鍔犺浇澶辫触锛?{e.message}</div></div>`; }
+}
+
+async function addStore() {
+  const inp = document.getElementById('newStoreName');
+  const name = inp.value.trim();
+  if (!name) return toast('璇疯緭鍏ラ棬搴楀悕绉?);
+  try {
+    await api('/api/admin/stores', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    inp.value = ''; toast('娣诲姞鎴愬姛'); renderStores();
+  } catch (e) { toast('娣诲姞澶辫触锛? + e.message); }
+}
+
+function editStore(id, oldName) {
+  const cell = document.getElementById('sn-' + id);
+  cell.innerHTML = `<div class="edit-inline"><input id="esi" value="${oldName}" onkeydown="if(event.key==='Enter')saveStore(${id})" onblur="saveStore(${id})"></div>`;
+  setTimeout(() => document.getElementById('esi')?.focus(), 50);
+}
+
+async function saveStore(id) {
+  const inp = document.getElementById('esi');
+  if (!inp) return;
+  const name = inp.value.trim();
+  if (!name) { renderStores(); return; }
+  try {
+    await api('/api/admin/stores/' + id, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    toast('淇敼鎴愬姛');
+  } catch (e) { toast('淇敼澶辫触锛? + e.message); }
+  renderStores();
+}
+
+// ---- Webhook ----
+function editWebhook(id, oldUrl) {
+  const cell = document.getElementById('sw-' + id);
+  cell.innerHTML = `<div class="edit-inline">
+    <input id="ewi" value="${oldUrl}" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." onkeydown="if(event.key==='Enter')saveWebhook(${id})">
+    <div style="margin-top:4px;display:flex;gap:6px;">
+      <button class="btn btn-green btn-sm" onclick="saveWebhook(${id})">淇濆瓨</button>
+      <button class="btn btn-ghost btn-sm" onclick="renderStores()">鍙栨秷</button>
+    </div>
+  </div>`;
+  setTimeout(() => document.getElementById('ewi')?.focus(), 50);
+}
+
+async function saveWebhook(id) {
+  const inp = document.getElementById('ewi');
+  if (!inp) return;
+  const url = inp.value.trim();
+  try {
+    await api('/api/admin/stores/' + id + '/webhook', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ webhook_url: url }),
+    });
+    toast(url ? 'Webhook 宸蹭繚瀛? : 'Webhook 宸叉竻闄?);
+  } catch (e) { toast('淇濆瓨澶辫触锛? + e.message); }
+  renderStores();
+}
+
+async function testWebhook(id) {
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = '鍙戦€佷腑鈥?;
+  try {
+    const r = await api('/api/admin/stores/' + id + '/test-webhook', { method: 'POST' });
+    toast(r.success ? '鉁?娴嬭瘯娑堟伅鍙戦€佹垚鍔燂紒璇锋煡鐪嬩紒寰兢' : '鉂?' + (r.error || '鍙戦€佸け璐?));
+  } catch (e) { toast('鉂?' + e.message); }
+  btn.disabled = false; btn.textContent = '娴嬭瘯';
+}
+
+async function toggleStore(id) {
+  try { await api('/api/admin/stores/' + id + '/toggle', { method: 'PUT' }); toast('鐘舵€佸凡鍒囨崲'); renderStores(); }
+  catch (e) { toast('鎿嶄綔澶辫触锛? + e.message); }
+}
+
+async function deleteStore(id, name) {
+  if (!confirm(`纭畾瑕佸垹闄ら棬搴椼€?{name}銆嶅悧锛熷巻鍙叉彁浜よ褰曞皢淇濈暀銆俙)) return;
+  try { await api('/api/admin/stores/' + id, { method: 'DELETE' }); toast('宸插垹闄?); renderStores(); }
+  catch (e) { toast('鍒犻櫎澶辫触锛? + e.message); }
+}
+
+// ===== 鑿滃搧绠＄悊 =====
+async function renderDishes() {
+  const c = document.getElementById('tabContent');
+  try {
+    const dishes = await api('/api/admin/dishes');
+    const rows = dishes.map(d => `<tr>
+      <td>${d.id}</td>
+      <td id="dn-${d.id}">${d.name}</td>
+      <td><span class="tag ${d.active?'tag-on':'tag-off'}">${d.active?'鍚敤':'鍋滅敤'}</span></td>
+      <td class="actions">
+        <button class="btn btn-outline btn-sm" onclick="editDish(${d.id},'${d.name.replace(/'/g,"\\'")}')">缂栬緫</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleDish(${d.id})">${d.active?'鍋滅敤':'鍚敤'}</button>
+        <button class="btn btn-ghost btn-sm" onclick="deleteDish(${d.id},'${d.name.replace(/'/g,"\\'")}')">鍒犻櫎</button>
+      </td>
+    </tr>`).join('');
+
+    c.innerHTML = `<div class="card">
+      <h3>馃嵆 鑿滃搧鍒楄〃</h3>
+      <p style="font-size:12px;color:#999;margin-bottom:12px;">鍋滅敤鐨勮彍鍝佸湪鍘ㄥ笀闀垮～鎶ョ涓嶄細鏄剧ず锛屽巻鍙叉暟鎹繚鐣欍€?/p>
+      <div class="add-row">
+        <input id="newDishName" placeholder="杈撳叆鏂拌彍鍝佸悕绉? onkeydown="if(event.key==='Enter')addDish()">
+        <button class="btn btn-red" onclick="addDish()">娣诲姞鑿滃搧</button>
+      </div>
+      <table class="list-table">
+        <thead><tr><th>ID</th><th>鍚嶇О</th><th>鐘舵€?/th><th class="actions">鎿嶄綔</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="4" class="empty">鏆傛棤鑿滃搧</td></tr>'}</tbody>
+      </table>
+    </div>`;
+    window._dishes = dishes;
+  } catch (e) { c.innerHTML = `<div class="card"><div class="empty">鍔犺浇澶辫触锛?{e.message}</div></div>`; }
+}
+
+async function addDish() {
+  const inp = document.getElementById('newDishName');
+  const name = inp.value.trim();
+  if (!name) return toast('璇疯緭鍏ヨ彍鍝佸悕绉?);
+  try {
+    await api('/api/admin/dishes', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    inp.value = ''; toast('娣诲姞鎴愬姛'); renderDishes();
+  } catch (e) { toast('娣诲姞澶辫触锛? + e.message); }
+}
+
+function editDish(id, oldName) {
+  const cell = document.getElementById('dn-' + id);
+  cell.innerHTML = `<div class="edit-inline"><input id="edi" value="${oldName}" onkeydown="if(event.key==='Enter')saveDish(${id})" onblur="saveDish(${id})"></div>`;
+  setTimeout(() => document.getElementById('edi')?.focus(), 50);
+}
+
+async function saveDish(id) {
+  const inp = document.getElementById('edi');
+  if (!inp) return;
+  const name = inp.value.trim();
+  if (!name) { renderDishes(); return; }
+  try {
+    await api('/api/admin/dishes/' + id, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    toast('淇敼鎴愬姛');
+  } catch (e) { toast('淇敼澶辫触锛? + e.message); }
+  renderDishes();
+}
+
+async function toggleDish(id) {
+  try { await api('/api/admin/dishes/' + id + '/toggle', { method: 'PUT' }); toast('鐘舵€佸凡鍒囨崲'); renderDishes(); }
+  catch (e) { toast('鎿嶄綔澶辫触锛? + e.message); }
+}
+
+async function deleteDish(id, name) {
+  if (!confirm(`纭畾瑕佸垹闄よ彍鍝併€?{name}銆嶅悧锛焋)) return;
+  try { await api('/api/admin/dishes/' + id, { method: 'DELETE' }); toast('宸插垹闄?); renderDishes(); }
+  catch (e) { toast('鍒犻櫎澶辫触锛? + e.message); }
+}
+</script>
+</body>
+</html>
