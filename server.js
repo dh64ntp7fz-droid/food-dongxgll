@@ -170,8 +170,13 @@ app.post('/api/submit', async (req, res) => {
     // 发提交通知到群（异步，不影响响应）
     const wh = getWebhookUrl();
     if (wh) {
+      let msg = '✅ ' + storeName + ' 已提交\n───────────\n';
+      items.forEach(function(i) {
+        msg += i.dish_name + '：' + (i.quantity || 0) + '份\n';
+      });
       const total = items.reduce((s, i) => s + (i.quantity || 0), 0);
-      sendWecomMsg(wh, '✅ ' + storeName + ' 已提交不能隔夜菜品数据（剩余共' + total + '份）');
+      msg += '───────────\n剩余共' + total + '份';
+      sendWecomMsg(wh, msg);
     }
     res.json({ success: true, message: '提交成功！' });
   } catch (e) { res.status(500).json({ error: e.message }); }
