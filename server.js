@@ -54,17 +54,17 @@ function sendWecomMsg(webhookUrl, content) {
   });
 }
 
-/** 向所有已配置 Webhook 的门店群发消息 */
+/** 获取全局 Webhook 地址 */
+function getWebhookUrl() {
+  return db.getSetting('webhook_url');
+}
+
+/** 向全局 Webhook 发送群消息 */
 async function broadcastToAll(msg) {
-  const stores = db.getAllStores();
-  let sent = 0;
-  for (const s of stores) {
-    if (s.webhook_url) {
-      const ok = await sendWecomMsg(s.webhook_url, msg);
-      if (ok) sent++;
-    }
-  }
-  return sent;
+  const wh = getWebhookUrl();
+  if (!wh) return 0;
+  const ok = await sendWecomMsg(wh, msg);
+  return ok ? 1 : 0;
 }
 
 // ================== 定时任务（服务器内部自检） ==================
@@ -180,7 +180,7 @@ app.get('/api/admin/stores', (_req, res) => {
 
 app.post('/api/admin/stores', (req, res) => {
   try {
-    const r = db.addStore(req.body.name, req.body.webhook_url || '');
+    const r = db.addStore(req.body.name);
     res.json({ success: true, id: r.lastInsertRowid });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -200,46 +200,27 @@ app.delete('/api/admin/stores/:id', (req, res) => {
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/admin/stores/:id/webhook', (req, res) => {
-  try { db.updateStoreWebhook(Number(req.params.id), req.body.webhook_url || ''); res.json({ success: true }); }
+// --- 全局设置（Webhook） ---
+app.get('/api/admin/settings/webhook', (req, res) => {
+  try { res.json({ webhook_url: db.getSetting('webhook_url') || '' }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/admin/stores/:id/test-webhook', (req, res) => {
+app.put('/api/admin/settings/webhook', (req, res) => {
   try {
-    const stores = db.getAllStores();
-    const store = stores.find(s => s.id === Number(req.params.id));
-    if (!store || !store.webhook_url) return res.status(400).json({ error: '该门店未配置 Webhook 地址' });
-
-    const https = require('https');
-    const url = new URL(store.webhook_url);
-    const payload = JSON.stringify({
-      msgtype: 'text',
-      text: { content: '** 测试消息\n门店：' + store.name + '\n菜品报损系统 Webhook 配置正常！' }
-    });
-
-    const opts = {
-      hostname: url.hostname,
-      path: url.pathname + url.search,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
-    };
-
-    const hreq = https.request(opts, (hres) => {
-      let body = '';
-      hres.on('data', d => body += d);
-      hres.on('end', () => {
-        try {
-          const r = JSON.parse(body);
-          if (r.errcode === 0) res.json({ success: true, message: '发送成功' });
-          else res.json({ success: false, error: r.errmsg || body });
-        } catch (_) { res.json({ success: false, error: body }); }
-      });
-    });
-    hreq.on('error', e => res.status(500).json({ error: e.message }));
-    hreq.write(payload);
-    hreq.end();
+    db.setSetting('webhook_url', req.body.webhook_url || '');
+    res.json({ success: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/admin/settings/test-webhook', async (req, res) => {
+  try {
+    const wh = db.getSetting('webhook_url');
+    if (!wh) return res.status(400).json({ error: '未配置 Webhook 地址' });
+    const ok = await sendWecomMsg(wh, '** 测试消息\n菜品报损系统 Webhook 配置正常！');
+    res.json({ success: ok, message: ok ? '发送成功' : '发送失败' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 });
 
 // --- 菜品管理 ---

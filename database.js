@@ -21,7 +21,6 @@ function initDb() {
     CREATE TABLE IF NOT EXISTS stores (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
-      webhook_url TEXT NOT NULL DEFAULT '',
       active INTEGER NOT NULL DEFAULT 1,
       sort_order INTEGER NOT NULL DEFAULT 0
     );
@@ -41,20 +40,32 @@ function initDb() {
       FOREIGN KEY (store_id) REFERENCES stores(id)
     );
     CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_store_date ON submissions(store_id, date);
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL DEFAULT ''
+    );
   `);
 
-  // 种子数据：只在空表时插入（避免覆盖用户数据）
+  // 种子数据
   const storeCount = db.prepare('SELECT COUNT(*) as cnt FROM stores').get().cnt;
   if (storeCount === 0) {
-    const insertStore = db.prepare('INSERT INTO stores (name, sort_order, webhook_url) VALUES (?, ?, ?)');
+    const insertStore = db.prepare('INSERT INTO stores (name, sort_order) VALUES (?, ?)');
     const stores = [
       '绿岛花园店', '石岩主场店', '大朗/牛陂店', '横岗店',
       '绿荷/育儿店', '科茗店', '体育馆店'
     ];
     const tx = db.transaction(() => {
-      stores.forEach((s, i) => insertStore.run(s, i, 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=44356646-0dda-484b-9a79-fa0ad45b8a50'));
+      stores.forEach((s, i) => insertStore.run(s, i));
     });
     tx();
+  }
+
+  // 默认 Webhook
+  const whCount = db.prepare("SELECT COUNT(*) as cnt FROM settings WHERE key='webhook_url'").get().cnt;
+  if (whCount === 0) {
+    db.prepare("INSERT INTO settings (key, value) VALUES ('webhook_url', ?)").run(
+      'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=44356646-0dda-484b-9a79-fa0ad45b8a50'
+    );
   }
 
   const dishCount = db.prepare('SELECT COUNT(*) as cnt FROM dishes').get().cnt;
@@ -135,6 +146,17 @@ function deleteDish(id) {
   return db.prepare('DELETE FROM dishes WHERE id = ?').run(id);
 }
 
+// ===================== Settings =====================
+
+function getSetting(key) {
+  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key);
+  return row ? row.value : null;
+}
+
+function setSetting(key, value) {
+  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, value);
+}
+
 // ===================== Submissions =====================
 
 function submitReport(storeId, storeName, date, items, submitTime) {
@@ -162,8 +184,9 @@ function getTodaySummary(date) {
 module.exports = {
   initDb,
   getActiveStores, getAllStores,
-  addStore, updateStore, toggleStore, deleteStore, updateStoreWebhook,
+  addStore, updateStore, toggleStore, deleteStore,
   getActiveDishes, getAllDishes,
   addDish, updateDish, toggleDish, deleteDish,
   submitReport, getSubmission, getTodaySubmissions, getTodaySummary,
+  getSetting, setSetting,
 };

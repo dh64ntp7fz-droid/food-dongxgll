@@ -383,23 +383,22 @@ async function showSettingsContent() {
   c.innerHTML = '<div class="loading">加载中...</div>';
 
   try {
-    var storeList = await api('/api/admin/stores');
-    var dishList = await api('/api/admin/dishes');
+    var [storeList, dishList, whData] = await Promise.all([
+      api('/api/admin/stores'),
+      api('/api/admin/dishes'),
+      api('/api/admin/settings/webhook'),
+    ]);
+    var whUrl = whData.webhook_url || '';
 
     var storeItems = storeList.map(function(s) {
       return '<div style="background:#fafafa;border-radius:10px;padding:12px;margin-bottom:8px;">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;">' +
           '<span><strong>' + s.name + '</strong> <span class="tag ' + (s.active?'tag-on':'tag-off') + '">' + (s.active?'启用':'停用') + '</span></span>' +
           '<span style="display:flex;gap:4px;">' +
             '<button class="btn btn-outline-sm btn-sm" onclick="editSettingStore(' + s.id + ')">编辑</button>' +
             '<button class="btn btn-outline-sm btn-sm" onclick="toggleSettingStore(' + s.id + ')">' + (s.active?'停用':'启用') + '</button>' +
             '<button class="btn btn-ghost-sm btn-sm" onclick="deleteSettingStore(' + s.id + ')">删除</button>' +
           '</span>' +
-        '</div>' +
-        '<div style="display:flex;gap:6px;align-items:center;">' +
-          '<input id="wh_' + s.id + '" value="' + (s.webhook_url || '') + '" placeholder="默认: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=44356646..." style="flex:1;padding:7px 10px;border:2px solid #e8e8e8;border-radius:6px;font-size:13px;outline:none;font-family:inherit;" onfocus="this.select()">' +
-          '<button class="btn btn-green-sm btn-sm" onclick="saveStoreWebhook(' + s.id + ')">保存</button>' +
-          '<button class="btn btn-outline-sm btn-sm" onclick="testStoreWebhook(' + s.id + ')"' + (s.webhook_url ? '' : ' disabled') + '>测试</button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -416,6 +415,17 @@ async function showSettingsContent() {
     }).join('');
 
     c.innerHTML =
+      // ── 全局 Webhook ──
+      '<h3>📢 企业微信机器人</h3>' +
+      '<div class="setting-section" style="background:#FFF9F0;border:1px solid #F5ECD7;border-radius:10px;padding:14px;margin-bottom:12px;">' +
+        '<label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Webhook 地址（所有门店共用一个）</label>' +
+        '<div class="setting-row">' +
+          '<input id="globalWhInput" value="' + whUrl.replace(/"/g,'&quot;') + '" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." style="flex:1;padding:7px 10px;border:2px solid #e8e8e8;border-radius:6px;font-size:13px;outline:none;font-family:inherit;">' +
+          '<button class="btn btn-green-sm btn-sm" onclick="saveGlobalWebhook()">保存</button>' +
+          '<button class="btn btn-outline-sm btn-sm" onclick="testGlobalWebhook()">测试</button>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text-light);margin-top:6px;">定时提醒和汇总每天自动推送到此地址</div>' +
+      '</div>' +
       // ── 门店管理 ──
       '<h3>🏪 门店管理</h3>' +
       '<div class="setting-section">' +
@@ -448,6 +458,27 @@ async function showSettingsContent() {
 
 function refreshSettings() { showSettingsContent(); }
 
+// ── 全局 Webhook ──
+async function saveGlobalWebhook() {
+  var inp = document.getElementById('globalWhInput');
+  if (!inp) return;
+  var url = inp.value.trim();
+  try {
+    await api('/api/admin/settings/webhook', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ webhook_url: url }),
+    });
+    toast(url ? 'Webhook 已保存' : 'Webhook 已清除');
+  } catch (e) { toast('保存失败：' + e.message, true); }
+}
+
+async function testGlobalWebhook() {
+  try {
+    var r = await api('/api/admin/settings/test-webhook', { method: 'POST' });
+    toast(r.success ? '✅ 测试消息发送成功！请查看企微群' : '❌' + (r.error || '发送失败'));
+  } catch (e) { toast('❌' + e.message, true); }
+}
+
 // ── 门店操作 ──
 async function addSettingStore() {
   var inp = document.getElementById('newStoreInput');
@@ -456,10 +487,7 @@ async function addSettingStore() {
   try {
     await api('/api/admin/stores', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: name,
-        webhook_url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=44356646-0dda-484b-9a79-fa0ad45b8a50',
-      }),
+      body: JSON.stringify({ name: name }),
     });
     inp.value = ''; toast('添加成功'); showSettingsContent();
     refreshStores();
@@ -503,28 +531,6 @@ async function deleteSettingStore(id) {
     toast('已删除'); showSettingsContent();
     refreshStores();
   } catch (e) { toast('删除失败：' + e.message, true); }
-}
-
-// ── Webhook 配置 ──
-async function saveStoreWebhook(id) {
-  var inp = document.getElementById('wh_' + id);
-  if (!inp) return;
-  var url = inp.value.trim();
-  try {
-    await api('/api/admin/stores/' + id + '/webhook', {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ webhook_url: url }),
-    });
-    toast(url ? 'Webhook 已保存' : 'Webhook 已清除');
-    showSettingsContent();
-  } catch (e) { toast('保存失败：' + e.message, true); }
-}
-
-async function testStoreWebhook(id) {
-  try {
-    var r = await api('/api/admin/stores/' + id + '/test-webhook', { method: 'POST' });
-    toast(r.success ? '✅ 测试消息发送成功！请查看企微群' : '❌' + (r.error || '发送失败'));
-  } catch (e) { toast('❌' + e.message, true); }
 }
 
 // ── 菜品操作 ──
