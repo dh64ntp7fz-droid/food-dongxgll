@@ -3,107 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>菜品报损填报</title>
+<title>湘阁里辣 · 菜品报损</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center;
-    padding: 20px;
-  }
-  .container {
-    width: 100%; max-width: 500px; background: #fff; border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden;
-  }
-  .header {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: #fff; padding: 24px; text-align: center;
-  }
-  .header h1 { font-size: 22px; font-weight: 600; }
-  .header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
-  .content { padding: 20px 24px; }
-  .form-group { margin-bottom: 20px; }
-  .form-group label {
-    display: block; font-size: 14px; font-weight: 600; color: #333;
-    margin-bottom: 6px;
-  }
-  .form-group select {
-    width: 100%; padding: 10px 12px; font-size: 15px; border: 1.5px solid #ddd;
-    border-radius: 8px; background: #fff; appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 12px center;
-    cursor: pointer;
-  }
-  .dish-list { margin-bottom: 20px; }
-  .dish-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 0; border-bottom: 1px solid #f0f0f0;
-  }
-  .dish-item:last-child { border-bottom: none; }
-  .dish-name { font-size: 15px; color: #333; flex: 1; }
-  .dish-input {
-    display: flex; align-items: center; gap: 6px;
-  }
-  .dish-input button {
-    width: 32px; height: 32px; border: 1.5px solid #ddd; background: #f9f9f9;
-    border-radius: 6px; font-size: 18px; cursor: pointer; color: #666;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .dish-input button:active { background: #eee; }
-  .dish-input input {
-    width: 60px; text-align: center; font-size: 16px; padding: 6px;
-    border: 1.5px solid #ddd; border-radius: 6px; -moz-appearance: textfield;
-  }
-  .dish-input input::-webkit-outer-spin-button,
-  .dish-input input::-webkit-inner-spin-button { -webkit-appearance: none; }
-  .btn-submit {
-    width: 100%; padding: 14px; font-size: 17px; font-weight: 600;
-    color: #fff; background: #e74c3c; border: none; border-radius: 10px;
-    cursor: pointer; margin-top: 10px; transition: background 0.2s;
-  }
-  .btn-submit:hover { background: #c0392b; }
-  .btn-submit:active { transform: scale(0.98); }
-  .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-  .success-box {
-    text-align: center; padding: 60px 24px;
-  }
-  .success-box .icon {
-    width: 72px; height: 72px; background: #27ae60; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px; font-size: 36px; color: #fff;
-  }
-  .success-box h2 { font-size: 20px; color: #333; margin-bottom: 8px; }
-  .success-box p { font-size: 14px; color: #999; }
-  .loading { text-align: center; padding: 40px; color: #999; }
-  .error-box {
-    background: #fff3f3; border: 1px solid #ffcdd2; border-radius: 8px;
-    padding: 12px 16px; color: #c0392b; font-size: 14px; margin-bottom: 16px;
-  }
-  .already-submitted {
-    text-align: center; padding: 40px 24px;
-  }
-  .already-submitted .icon {
-    width: 72px; height: 72px; background: #f39c12; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px; font-size: 36px;
-  }
-  .already-submitted h2 { font-size: 18px; color: #333; margin-bottom: 8px; }
-  .already-submitted p { font-size: 14px; color: #999; }
-  .footer {
-    text-align: center; padding: 16px; font-size: 12px; color: #bbb;
-    border-top: 1px solid #f0f0f0;
-  }
+:root {
+  --bg: #FDF8F0; --card-bg: #FFFFFF; --primary: #B22222;
+  --gold: #C9A96E; --gold-light: #F5ECD7; --text: #2C2C2C;
+  --text-light: #6B6B6B; --green: #2E7D32; --green-bg: #E8F5E9;
+  --red: #C62828; --red-bg: #FFEBEE;
+  --radius: 12px; --shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+  display: flex; justify-content: center; padding: 20px;
+}
+.container { width: 100%; max-width: 500px; }
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #5C0A0A 0%, #9B1B1B 30%, #7A1212 70%, #5C0A0A 100%);
+  color:#fff; padding:24px 20px; border-radius:var(--radius) var(--radius) 0 0;
+  text-align:center;
+  border-bottom:2px solid rgba(201,169,110,0.55);
+}
+.header h1 { font-size:22px; font-weight:700; letter-spacing:2px; }
+.header p { font-size:13px; opacity:0.8; margin-top:6px; color:var(--gold); letter-spacing:1px; }
+/* ── Content Card ── */
+.content-card {
+  background:var(--card-bg); border-radius:0 0 var(--radius) var(--radius);
+  padding:20px 20px; box-shadow:var(--shadow);
+}
+.form-group { margin-bottom:20px; }
+.form-group label {
+  display:block; font-size:13px; font-weight:600; color:var(--text);
+  margin-bottom:6px;
+}
+.form-group select {
+  width:100%; padding:10px 12px; font-size:15px; border:2px solid #e8e8e8;
+  border-radius:8px; background:#fafafa; appearance:none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  cursor: pointer; outline:none; font-family:inherit; transition:border-color .2s;
+}
+.form-group select:focus { border-color:var(--primary); }
+/* ── Dish List ── */
+.dish-list { margin-bottom:16px; }
+.dish-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 0; border-bottom:1px solid #f0f0f0;
+}
+.dish-item:last-child { border-bottom:none; }
+.dish-name { font-size:15px; color:var(--text); flex:1; }
+.dish-input { display:flex; align-items:center; gap:6px; }
+.dish-input button {
+  width:32px; height:32px; border:2px solid #e8e8e8; background:#fafafa;
+  border-radius:8px; font-size:18px; cursor:pointer; color:var(--text-light);
+  display:flex; align-items:center; justify-content:center; transition:all .15s;
+}
+.dish-input button:active { background:var(--gold-light); border-color:var(--gold); }
+.dish-input input {
+  width:56px; text-align:center; font-size:16px; font-weight:600; padding:6px;
+  border:2px solid #e8e8e8; border-radius:8px; outline:none; transition:border-color .2s;
+  font-family:inherit; -moz-appearance:textfield;
+}
+.dish-input input:focus { border-color:var(--primary); }
+.dish-input input::-webkit-outer-spin-button,
+.dish-input input::-webkit-inner-spin-button { -webkit-appearance:none; }
+/* ── Submit Button ── */
+.btn-submit {
+  width:100%; padding:14px; font-size:17px; font-weight:700;
+  background:linear-gradient(135deg, var(--primary), #D4443F);
+  color:#fff; border:none; border-radius:10px; cursor:pointer;
+  margin-top:8px; transition:all .2s;
+  box-shadow:0 4px 12px rgba(178,34,34,0.3);
+  font-family:inherit; letter-spacing:2px;
+}
+.btn-submit:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(178,34,34,0.4); }
+.btn-submit:active { transform:scale(0.98); }
+.btn-submit:disabled { background:#ccc; cursor:not-allowed; transform:none; box-shadow:none; }
+/* ── Status Pages ── */
+.success-box, .already-submitted {
+  text-align:center; padding:60px 20px;
+}
+.success-box .icon, .already-submitted .icon {
+  width:72px; height:72px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 20px; font-size:36px; color:#fff;
+}
+.success-box .icon { background:var(--green); }
+.already-submitted .icon { background:var(--gold); }
+.success-box h2, .already-submitted h2 { font-size:20px; color:var(--text); margin-bottom:8px; }
+.success-box p, .already-submitted p { font-size:14px; color:var(--text-light); }
+.loading { text-align:center; padding:40px; color:var(--text-light); }
+.error-box {
+  background:var(--red-bg); border:1px solid #ffcdd2; border-radius:8px;
+  padding:12px 16px; color:var(--red); font-size:14px; margin-bottom:16px;
+}
+/* ── Footer ── */
+.footer {
+  text-align:center; padding:16px; font-size:12px; color:#bbb;
+}
+.footer a { color:#bbb; text-decoration:none; }
+.footer a:hover { color:var(--primary); }
 </style>
 </head>
 <body>
 <div class="container" id="app">
   <div class="header">
     <h1>🍔 每日菜品报损</h1>
-    <p>请于每日 20:00 前完成填报/p>
+    <p>请于每日 20:00 前完成填报</p>
   </div>
-  <div id="main-content"></div>
+  <div class="content-card">
+    <div id="main-content"></div>
+  </div>
   <div class="footer">
-    数据仅用于内部管理 · 请如实填报    <br><a href="/admin.html" style="color:#999;text-decoration:none;font-size:11px;">🔑 管理入口</a>
+    数据仅用于内部管理 · 请如实填报<br>
+    <a href="/admin.html">🔑 管理入口</a>
   </div>
 </div>
 
@@ -117,8 +132,6 @@ let quantities = {};
 let selectedStoreId = null;
 let alreadySubmitted = false;
 let submitting = false;
-
-// ============== 初始化==============
 
 async function init() {
   const main = document.getElementById('main-content');
@@ -148,18 +161,16 @@ async function init() {
   }
 }
 
-// ============== 娓叉煋琛ㄥ崟 ==============
-
 function renderForm(showAlready = false) {
   const main = document.getElementById('main-content');
 
   if (showAlready && selectedStoreId) {
     main.innerHTML = `
       <div class="already-submitted">
-        <div class="icon">✅/div>
+        <div class="icon">✅</div>
         <h2>今日已填报，谢谢</h2>
         <p>门店「${stores.find(s => s.id === selectedStoreId)?.name || ''}」今日的报损数据已提交</p>
-        <p style="margin-top:16px;font-size:13px;">如需修改请联系管理员</p>
+        <p style="margin-top:16px;font-size:13px;color:var(--text-light);">如需修改请联系管理员</p>
       </div>`;
     return;
   }
@@ -172,7 +183,7 @@ function renderForm(showAlready = false) {
     <div class="dish-item">
       <span class="dish-name">${d.name}</span>
       <div class="dish-input">
-        <button onclick="changeQty(${d.id}, -1)">−/button>
+        <button onclick="changeQty(${d.id}, -1)">−</button>
         <input type="number" id="qty_${d.id}" value="${quantities[d.id]}" min="0"
           onchange="onQtyChange(${d.id}, this.value)"
           onfocus="this.select()">
@@ -182,25 +193,22 @@ function renderForm(showAlready = false) {
   `).join('');
 
   main.innerHTML = `
-    <div class="content">
-      <div class="form-group">
-        <label>选择门店</label>
-        <select id="storeSelect" onchange="onStoreChange(this.value)">
-          <option value="">-- 请选择门店 --</option>
-          ${storeOpts}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>菜品剩余数量（剩余数量 = 当天卖剩下的 / 无法隔夜保存的）</label>
-      </div>
+    <div class="form-group">
+      <label>🏪 选择门店</label>
+      <select id="storeSelect" onchange="onStoreChange(this.value)">
+        <option value="">-- 请选择门店 --</option>
+        ${storeOpts}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>📋 菜品剩余数量</label>
+      <p style="font-size:12px;color:var(--text-light);margin-top:-4px;margin-bottom:8px;">剩余数量 = 当天卖剩下的 / 无法隔夜保存的</p>
       <div class="dish-list">${dishItems}</div>
-      <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()" ${!selectedStoreId ? 'disabled' : ''}>
-        确认提交
-      </button>
-    </div>`;
+    </div>
+    <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()" ${!selectedStoreId ? 'disabled' : ''}>
+      确认提交
+    </button>`;
 }
-
-// ============== 事件处理 ==============
 
 async function onStoreChange(storeId) {
   selectedStoreId = storeId ? Number(storeId) : null;
@@ -208,14 +216,11 @@ async function onStoreChange(storeId) {
 
   if (!selectedStoreId) return;
 
-  // 检查是否已提交
   try {
-    const res = await fetch(API + `/api/check-submission?storeId=${selectedStoreId}&date=${TODAY}`);
+    const res = await fetch(API + '/api/check-submission?storeId=' + selectedStoreId + '&date=' + TODAY);
     const { submitted } = await res.json();
     alreadySubmitted = submitted;
-    if (submitted) {
-      renderForm(true);
-    }
+    if (submitted) renderForm(true);
   } catch (_) {}
 }
 
