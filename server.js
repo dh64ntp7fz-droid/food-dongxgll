@@ -84,7 +84,7 @@ function buildSummary() {
   const summary = db.getTodaySummary(date);
   const d = new Date(date + 'T00:00:00+08:00');
   const month = d.getMonth() + 1, day = d.getDate();
-  let text = `📊 菜品报损汇总（${month}月${day}日）\n\n`;
+  let text = `📊 不能隔夜菜品上报汇总（${month}月${day}日）\n\n`;
   text += `✅ 已填报（${summary.submitted.length}家）：`;
   text += summary.submitted.length > 0 ? summary.submitted.map(s => s.store_name).join('、') : '无';
   text += `\n❌ 未填报（${summary.notSubmitted.length}家）：`;
@@ -217,10 +217,9 @@ app.post('/api/admin/settings/test-webhook', async (req, res) => {
   try {
     const wh = db.getSetting('webhook_url');
     if (!wh) return res.status(400).json({ error: '未配置 Webhook 地址' });
-    const ok = await sendWecomMsg(wh, '** 测试消息\n菜品报损系统 Webhook 配置正常！');
+    const ok = await sendWecomMsg(wh, '** 测试消息\n不能隔夜菜品上报系统 Webhook 配置正常！');
     res.json({ success: ok, message: ok ? '发送成功' : '发送失败' });
   } catch (e) { res.status(500).json({ error: e.message }); }
-});
 });
 
 // --- 菜品管理 ---
@@ -263,7 +262,7 @@ app.get('/api/admin/report-text', (req, res) => {
     const d = new Date(date + 'T00:00:00+08:00');
     const month = d.getMonth() + 1, day = d.getDate();
 
-    let text = `=== 今日菜品报损汇总（${month}月${day}日）\n`;
+    let text = `=== 今日不能隔夜菜品上报汇总（${month}月${day}日）\n`;
     text += `────────────────────\n`;
     text += `✅ 已提交（${summary.submitted.length}家）：`;
     text += summary.submitted.length > 0 ? summary.submitted.map(s => s.store_name).join('、') : '无';
@@ -329,7 +328,7 @@ app.get('/api/cron/status', (req, res) => {
 db.initDb();
 app.listen(PORT, () => {
   console.log('========================================');
-  console.log('  餐厅每日菜品报损系统');
+  console.log('  餐厅每日不能隔夜菜品上报系统');
   console.log('========================================');
   console.log(`  填报页面 : http://localhost:${PORT}/`);
   console.log('========================================');
