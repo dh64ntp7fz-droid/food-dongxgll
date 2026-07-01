@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: food-waste
+    env: node
+    buildCommand: npm install && node -e "require('./database').initDb()"
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: ADMIN_PASSWORD
+        value: admin123
+      - key: DB_PATH
+        value: /opt/render/project/src/data/food-waste.db
