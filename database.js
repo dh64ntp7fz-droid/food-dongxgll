@@ -119,12 +119,14 @@ async function q(text, params) {
   if (isPg) return (await pool.query(text, params)).rows;
   if (!sqDb) return [];
   if (params) {
-    const stmt = sqDb.prepare(text);
+    // Convert $N to ? for SQLite compatibility
+    const sql = text.replace(/\$(\d+)/g, '?');
+    const stmt = sqDb.prepare(sql);
     if (/^\s*(SELECT|WITH)/i.test(text)) return stmt.all(...params);
     stmt.run(...params); return [];
   }
-  if (/^\s*(SELECT|WITH)/i.test(text)) return sqDb.prepare(text).all();
-  sqDb.prepare(text).run(); return [];
+  if (/^\s*(SELECT|WITH)/i.test(text)) return sqDb.prepare(text.replace(/\$(\d+)/g, '?')).all();
+  sqDb.prepare(text.replace(/\$(\d+)/g, '?')).run(); return [];
 }
 
 // 表名映射：PostgreSQL 用 food_ 前缀
