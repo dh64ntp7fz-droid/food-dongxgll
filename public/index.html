@@ -196,11 +196,24 @@ async function lSet(t){
 function rStores(){
   var h='<div class="card"><div class="set-sec-t">➕ 新增区域</div><div class="set-r"><input id="nR" placeholder="区域名称"><button class="set-btn rd" onclick="aR()">新增</button></div></div>';
   _rl.forEach(function(r){var rs=_sl.filter(function(s){return Number(s.region_id)===r.id});
-    h+='<div class="region-box"><div class="rh">📍 '+r.name+'</div><div class="set-r"><input id="ns_'+r.id+'" placeholder="门店名称"><button class="set-btn gr" onclick="aS('+r.id+')">+门店</button></div>';
+    h+='<div class="region-box"><div class="rh" style="display:flex;align-items:center;justify-content:space-between;"><span>📍 '+r.name+'</span><span>'+
+      '<button class="set-btn gh" onclick="reorderR('+r.id+',\'up\')" style="font-size:14px;padding:2px 6px;">▲</button>'+
+      '<button class="set-btn gh" onclick="reorderR('+r.id+',\'down\')" style="font-size:14px;padding:2px 6px;">▼</button>'+
+      '<button class="set-btn gh" onclick="delR('+r.id+')" style="color:var(--r);padding:2px 8px;">✕</button></span></div>'+
+      '<div class="set-r"><input id="ns_'+r.id+'" placeholder="门店名称"><button class="set-btn gr" onclick="aS('+r.id+')">+门店</button></div>';
     rs.forEach(function(s){h+='<div class="set-c"><span class="n">'+s.name+' <span class="tag '+(s.active?'tag-o':'tag-x')+'">'+(s.active?'启用':'停用')+'</span></span><span class="ac"><button class="set-btn ol" onclick="eS('+s.id+')">编辑</button><button class="set-btn ol" onclick="tS('+s.id+')">'+(s.active?'停用':'启用')+'</button><button class="set-btn gh" onclick="dS('+s.id+')">✕</button></span></div>'});
     if(!rs.length)h+='<div style="color:#aaa;font-size:12px;margin:6px 0;">暂无门店</div>';h+='</div>'
   });
   h+='<div style="text-align:center"><button class="set-btn gh" onclick="lSet(\'stores\')" style="padding:6px 14px;font-size:12px;">🔄 刷新</button></div>';return h
+}
+function reorderR(id,dir){
+  fetch(API+'/api/admin/regions/'+id+'/reorder',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({direction:dir})})
+    .then(function(){lSet('stores')}).catch(function(){})
+}
+function delR(id){
+  if(!confirm('确定删除该区域吗？门店将变为未分配'))return;
+  fetch(API+'/api/admin/regions/'+id,{method:'DELETE'})
+    .then(function(){lSet('stores')}).catch(function(){})
 }
 function rDishes(){
   var it=_dl.map(function(d){return'<div class="set-c"><span class="n">'+d.name+' <span class="tag '+(d.active?'tag-o':'tag-x')+'">'+(d.active?'启用':'停用')+'</span></span><span class="ac"><select id="dg_'+d.id+'"><option value="调改店"'+(d.dish_group==='调改店'?' selected':'')+'>调改</option><option value="非调改店"'+(d.dish_group==='非调改店'?' selected':'')+'>非调</option><option value="通用"'+(d.dish_group==='通用'||!d.dish_group?' selected':'')+'>通用</option></select><button class="set-btn ol" onclick="eD('+d.id+')">改名</button><button class="set-btn ol" onclick="tD('+d.id+')">'+(d.active?'停用':'启用')+'</button><button class="set-btn gh" onclick="dD('+d.id+')">✕</button></span></div>'}).join('');

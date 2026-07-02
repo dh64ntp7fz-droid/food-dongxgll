@@ -61,7 +61,22 @@ function addRegion(name, webhookUrl) {
   db.prepare('INSERT INTO regions (name, webhook_url, sort_order) VALUES (?,?,?)').run(name, webhookUrl || '', max);
 }
 function updateRegion(id, name, webhookUrl) { db.prepare('UPDATE regions SET name=?, webhook_url=? WHERE id=?').run(name, webhookUrl || '', id); }
-function deleteRegion(id) { db.prepare('DELETE FROM regions WHERE id=?').run(id); }
+function deleteRegion(id) {
+  // 把该区域的门店移到未分配
+  db.prepare('UPDATE stores SET region_id=0 WHERE region_id=?').run(id);
+  db.prepare('DELETE FROM regions WHERE id=?').run(id);
+}
+function reorderRegion(id, direction) {
+  // direction: 'up' 或 'down'
+  const r = db.prepare('SELECT id, sort_order FROM regions WHERE id=?').get(id);
+  if (!r) return;
+  const swap = direction === 'up'
+    ? db.prepare('SELECT id, sort_order FROM regions WHERE sort_order < ? ORDER BY sort_order DESC').get(r.sort_order)
+    : db.prepare('SELECT id, sort_order FROM regions WHERE sort_order > ? ORDER BY sort_order ASC').get(r.sort_order);
+  if (!swap) return;
+  db.prepare('UPDATE regions SET sort_order=? WHERE id=?').run(swap.sort_order, r.id);
+  db.prepare('UPDATE regions SET sort_order=? WHERE id=?').run(r.sort_order, swap.id);
+}
 
 // ===================== Stores =====================
 
@@ -120,7 +135,7 @@ function getTodaySummaryByRegion(date, rid) {
 }
 
 module.exports = {
-  initDb, getAllRegions, addRegion, updateRegion, deleteRegion,
+  initDb, getAllRegions, addRegion, updateRegion, deleteRegion, reorderRegion,
   getActiveStores, getActiveStoresByRegion, getAllStores, addStore, updateStore, toggleStore, deleteStore,
   getActiveDishes, getAllDishes, addDish, updateDish, toggleDish, deleteDish,
   submitReport, getSubmission, getTodaySubmissions, getTodaySummary, getTodaySummaryByRegion,

@@ -187,6 +187,11 @@ app.delete('/api/admin/regions/:id', (req, res) => {
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.put('/api/admin/regions/:id/reorder', (req, res) => {
+  try { db.reorderRegion(Number(req.params.id), req.body.direction); res.json({ success: true }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // --- 门店管理 ---
 app.get('/api/admin/stores', (_req, res) => {
   try { res.json(db.getAllStores()); } catch (e) { res.status(500).json({ error: e.message }); }
