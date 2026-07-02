@@ -157,7 +157,11 @@ function draw(){
   var rg=_r.map(function(r){var c=_s.filter(function(s){return Number(s.region_id)===r.id}).length;return'<div class="region-i'+(Number(rid)===r.id?' act':'')+'" onclick="sr('+r.id+')">'+r.name+'<span class="c">'+c+'家</span></div>'}).join('');
   if(sid){
     var st=_s.find(function(s){return s.id===sid});if(!st){sid=null;draw();return}
-    var gp={调改店:[],非调改店:[],通用:[]};_d.forEach(function(d){var g=d.dish_group||'通用';if(!gp[g])gp[g]=[];gp[g].push(d)});
+    // 按门店类型过滤菜品：调改店→调改+通用，非调改店→非调改+通用，通用→全部
+    var stGroup=(st.store_group||'通用');
+    var showGroups=(stGroup==='调改店'?['调改店','通用']:(stGroup==='非调改店'?['非调改店','通用']:['调改店','非调改店','通用']));
+    var fdDishes=_d.filter(function(d){return showGroups.includes(d.dish_group||'通用')});
+    var gp={};fdDishes.forEach(function(d){var g=d.dish_group||'通用';if(!gp[g])gp[g]=[];gp[g].push(d)});
     var di='<div class="card"><div class="card-title">📋 菜品剩余</div>';
     Object.keys(gp).forEach(function(g){if(!gp[g].length)return;
       di+='<div class="dish-group-label">▸ '+g+'</div>';
