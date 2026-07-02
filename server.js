@@ -288,11 +288,17 @@ app.get('/api/cron/status', async (req, res) => {
 
 // ================== 启动 ==================
 
-await db.initDb();
-app.listen(PORT, () => {
-  console.log('========================================');
-  console.log('  不能隔夜菜品上报系统');
-  console.log('========================================');
-  console.log(`  填报页面 : http://localhost:${PORT}/`);
-  console.log('========================================');
-});
+(async () => {
+  try {
+    await db.initDb();
+  } catch (e) {
+    console.error('[启动] 数据库初始化失败:', e.message);
+  }
+  app.listen(PORT, () => {
+    console.log('========================================');
+    console.log('  不能隔夜菜品上报系统');
+    console.log('========================================');
+    console.log(`  填报页面 : http://localhost:${PORT}/`);
+    console.log('========================================');
+  });
+})();
