@@ -207,19 +207,19 @@ function rStores(){
   h+='<div style="text-align:center"><button class="set-btn gh" onclick="lSet(\'stores\')" style="padding:6px 14px;font-size:12px;">🔄 刷新</button></div>';return h
 }
 function reorderR(id,dir){
-  fetch(API+'/api/admin/regions/'+id+'/reorder',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({direction:dir})})
+  fetch(A+'/api/admin/regions/'+id+'/reorder',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({direction:dir})})
     .then(function(){lSet('stores')}).catch(function(){})
 }
 function delR(id){
   if(!confirm('确定删除该区域吗？门店将变为未分配'))return;
-  fetch(API+'/api/admin/regions/'+id,{method:'DELETE'})
+  fetch(A+'/api/admin/regions/'+id,{method:'DELETE'})
     .then(function(){lSet('stores')}).catch(function(){})
 }
 function chgSg(id){
   var sel=document.getElementById('sg_'+id);
   if(!sel)return;
   var g=sel.value;
-  fetch(API+'/api/admin/stores/'+id+'/group',{
+  fetch(A+'/api/admin/stores/'+id+'/group',{
     method:'PUT',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({store_group:g})
