@@ -198,12 +198,17 @@ app.get('/api/admin/stores', (_req, res) => {
 });
 
 app.post('/api/admin/stores', (req, res) => {
-  try { const r = db.addStore(req.body.name, req.body.region_id); res.json({ success: true, id: r.lastInsertRowid }); }
+  try { const r = db.addStore(req.body.name, req.body.region_id, req.body.store_group); res.json({ success: true, id: r.lastInsertRowid }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.put('/api/admin/stores/:id', (req, res) => {
   try { db.updateStore(Number(req.params.id), req.body.name); res.json({ success: true }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/admin/stores/:id/group', (req, res) => {
+  try { db.updateStoreGroup(Number(req.params.id), req.body.store_group); res.json({ success: true }); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 

@@ -17,7 +17,7 @@ function initDb() {
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS regions (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, webhook_url TEXT DEFAULT '', sort_order INTEGER DEFAULT 0);
-    CREATE TABLE IF NOT EXISTS stores (id INTEGER PRIMARY KEY AUTOINCREMENT, region_id INTEGER DEFAULT 0, name TEXT UNIQUE, active INTEGER DEFAULT 1, sort_order INTEGER DEFAULT 0);
+    CREATE TABLE IF NOT EXISTS stores (id INTEGER PRIMARY KEY AUTOINCREMENT, region_id INTEGER DEFAULT 0, name TEXT UNIQUE, active INTEGER DEFAULT 1, store_group TEXT DEFAULT '通用', sort_order INTEGER DEFAULT 0);
     CREATE TABLE IF NOT EXISTS dishes (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, active INTEGER DEFAULT 1, dish_group TEXT DEFAULT '通用', sort_order INTEGER DEFAULT 0);
     CREATE TABLE IF NOT EXISTS submissions (id INTEGER PRIMARY KEY AUTOINCREMENT, store_id INTEGER, region_id INTEGER DEFAULT 0, store_name TEXT, date TEXT, items TEXT, submit_time TEXT);
     CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_store_date ON submissions(store_id, date);
@@ -28,6 +28,7 @@ function initDb() {
   if (!sCols.includes('region_id')) db.exec("ALTER TABLE stores ADD COLUMN region_id INTEGER DEFAULT 0");
   if (!sCols.includes('active')) db.exec("ALTER TABLE stores ADD COLUMN active INTEGER DEFAULT 1");
   if (!sCols.includes('sort_order')) db.exec("ALTER TABLE stores ADD COLUMN sort_order INTEGER DEFAULT 0");
+  if (!sCols.includes('store_group')) db.exec("ALTER TABLE stores ADD COLUMN store_group TEXT DEFAULT '通用'");
   const dCols = db.prepare("PRAGMA table_info(dishes)").all().map(c => c.name);
   if (!dCols.includes('dish_group')) db.exec("ALTER TABLE dishes ADD COLUMN dish_group TEXT DEFAULT '通用'");
 
@@ -80,14 +81,15 @@ function reorderRegion(id, direction) {
 
 // ===================== Stores =====================
 
-function getActiveStores() { return db.prepare('SELECT id,name,region_id FROM stores WHERE active=1 ORDER BY sort_order').all(); }
+function getActiveStores() { return db.prepare('SELECT id,name,region_id,store_group FROM stores WHERE active=1 ORDER BY sort_order').all(); }
 function getActiveStoresByRegion(rid) { return db.prepare('SELECT id,name FROM stores WHERE active=1 AND region_id=? ORDER BY sort_order').all(rid); }
 function getAllStores() { return db.prepare('SELECT s.*, r.name as region_name FROM stores s LEFT JOIN regions r ON s.region_id=r.id ORDER BY s.sort_order').all(); }
-function addStore(name, regionId) {
+function addStore(name, regionId, storeGroup) {
   const max = db.prepare('SELECT COALESCE(MAX(sort_order),0)+1 as m FROM stores').get().m;
-  db.prepare('INSERT INTO stores (region_id, name, sort_order) VALUES (?,?,?)').run(regionId || 0, name, max);
+  db.prepare('INSERT INTO stores (region_id, name, store_group, sort_order) VALUES (?,?,?,?)').run(regionId || 0, name, storeGroup || '通用', max);
 }
 function updateStore(id, name) { db.prepare('UPDATE stores SET name=? WHERE id=?').run(name, id); }
+function updateStoreGroup(id, storeGroup) { db.prepare('UPDATE stores SET store_group=? WHERE id=?').run(storeGroup, id); }
 function toggleStore(id) {
   const s = db.prepare('SELECT active FROM stores WHERE id=?').get(id);
   db.prepare('UPDATE stores SET active=? WHERE id=?').run(s?.active ? 0 : 1, id);
@@ -136,7 +138,7 @@ function getTodaySummaryByRegion(date, rid) {
 
 module.exports = {
   initDb, getAllRegions, addRegion, updateRegion, deleteRegion, reorderRegion,
-  getActiveStores, getActiveStoresByRegion, getAllStores, addStore, updateStore, toggleStore, deleteStore,
+  getActiveStores, getActiveStoresByRegion, getAllStores, addStore, updateStore, updateStoreGroup, toggleStore, deleteStore,
   getActiveDishes, getAllDishes, addDish, updateDish, toggleDish, deleteDish,
   submitReport, getSubmission, getTodaySubmissions, getTodaySummary, getTodaySummaryByRegion,
 };
