@@ -159,7 +159,7 @@ function draw(){
     var st=_s.find(function(s){return s.id===sid});if(!st){sid=null;draw();return}
     // 按门店类型过滤菜品：调改店→调改+通用，非调改店→非调改+通用，通用→全部
     var stGroup=(st.store_group||'通用');
-    var showGroups=(stGroup==='调改店'?['调改店','通用']:(stGroup==='非调改店'?['非调改店','通用']:['调改店','非调改店','通用']));
+    var showGroups=(stGroup==='调改店'?['调改店','非调改店','通用']:['非调改店','通用']);
     var fdDishes=_d.filter(function(d){return showGroups.includes(d.dish_group||'通用')});
     var gp={};fdDishes.forEach(function(d){var g=d.dish_group||'通用';if(!gp[g])gp[g]=[];gp[g].push(d)});
     var di='<div class="card"><div class="card-title">📋 菜品剩余</div>';
@@ -170,7 +170,7 @@ function draw(){
     m.innerHTML='<div class="card"><div class="card-title">📋 区域</div><div class="region-grid">'+rg+'</div></div><div class="card"><div class="st"><div class="st-l"><span style="color:var(--t2);font-size:12px">🏪</span><span class="n">'+st.name+'</span></div><button class="b" onclick="sid=null;draw()">换</button></div></div>'+di+'<button class="btn-p" id="btnS" onclick="sub()">确认提交</button>';
   }else{
     var fd=rid?_s.filter(function(s){return Number(s.region_id)===Number(rid)}):_s;
-    var sg=fd.map(function(s){var gt=s.store_group||'通用';var bc=gt=='调改店'?'#FFE8D0':gt=='非调改店'?'#D6ECFF':'#f0ece5';var tc=gt=='调改店'?'#BF4A00':gt=='非调改店'?'#0055AA':'#888';return'<div class="store-i" onclick="ss('+s.id+')">'+s.name+'<br><span style="font-size:10px;display:inline-block;padding:1px 6px;border-radius:4px;background:'+bc+';color:'+tc+'">'+gt+'</span></div>'}).join('');
+    var sg=fd.map(function(s){var gt=s.store_group||'通用';var bc=gt=='调改店'?'#FFE8D0':'#D6ECFF';var tc=gt=='调改店'?'#BF4A00':'#0055AA';return'<div class="store-i" onclick="ss('+s.id+')">'+s.name+'<br><span style="font-size:10px;display:inline-block;padding:1px 6px;border-radius:4px;background:'+bc+';color:'+tc+'">'+gt+'</span></div>'}).join('');
     m.innerHTML='<div class="card"><div class="card-title">📋 区域</div><div class="region-grid">'+rg+'</div></div><div class="card"><div class="card-title">🏪 门店</div><div class="store-grid">'+(sg||'<div style="color:#999;font-size:13px;grid-column:1/-1">暂无门店</div>')+'</div></div>';
   }
 }
@@ -204,8 +204,8 @@ function rStores(){
       '<button class="set-btn gh" onclick="reorderR('+r.id+',\'up\')" style="font-size:14px;padding:2px 6px;">▲</button>'+
       '<button class="set-btn gh" onclick="reorderR('+r.id+',\'down\')" style="font-size:14px;padding:2px 6px;">▼</button>'+
       '<button class="set-btn gh" onclick="delR('+r.id+')" style="color:var(--r);padding:2px 8px;">✕</button></span></div>'+
-      '<div class="set-r"><input id="ns_'+r.id+'" placeholder="门店名称" style="flex:1"><select id="sg_add_'+r.id+'" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;outline:none;font-family:inherit;background:#fafafa"><option value="调改店">调改</option><option value="非调改店">非调</option><option value="通用">通用</option></select><button class="set-btn gr" onclick="aS('+r.id+')">+门店</button></div>';
-    rs.forEach(function(s){var sg=s.store_group||'通用';h+='<div class="set-c"><span class="n">'+s.name+' <span class="tag '+(s.active?'tag-o':'tag-x')+'">'+(s.active?'启用':'停用')+'</span><br><span style="font-size:10px;padding:1px 5px;border-radius:3px;background:'+(sg=='调改店'?'#FFE8D0':sg=='非调改店'?'#D6ECFF':'#f0ece5')+';color:'+(sg=='调改店'?'#BF4A00':sg=='非调改店'?'#0055AA':'#888')+';display:inline-block;margin-top:2px">'+sg+'</span></span><span class="ac"><select id="sg_'+s.id+'" onchange="chgSg('+s.id+')" style="padding:3px 6px;font-size:11px;border-radius:5px;border:1px solid #ddd;font-family:inherit;outline:none"><option value="调改店"'+(sg=='调改店'?' selected':'')+'>调改</option><option value="非调改店"'+(sg=='非调改店'?' selected':'')+'>非调</option><option value="通用"'+(sg=='通用'?' selected':'')+'>通用</option></select><button class="set-btn ol" onclick="eS('+s.id+')">改名</button><button class="set-btn ol" onclick="tS('+s.id+')">'+(s.active?'停用':'启用')+'</button><button class="set-btn gh" onclick="dS('+s.id+')">✕</button></span></div>'});
+      '<div class="set-r"><input id="ns_'+r.id+'" placeholder="门店名称" style="flex:1"><select id="sg_add_'+r.id+'" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;outline:none;font-family:inherit;background:#fafafa"><option value="调改店">调改</option><option value="非调改店">非调</option></select><button class="set-btn gr" onclick="aS('+r.id+')">+门店</button></div>';
+    rs.forEach(function(s){var sg=s.store_group||'通用';h+='<div class="set-c"><span class="n">'+s.name+' <span class="tag '+(s.active?'tag-o':'tag-x')+'">'+(s.active?'启用':'停用')+'</span><br><span style="font-size:10px;padding:1px 5px;border-radius:3px;background:'+(sg=='调改店'?'#FFE8D0':sg=='非调改店'?'#D6ECFF':'#f0ece5')+';color:'+(sg=='调改店'?'#BF4A00':sg=='非调改店'?'#0055AA':'#888')+';display:inline-block;margin-top:2px">'+sg+'</span></span><span class="ac"><select id="sg_'+s.id+'" onchange="chgSg('+s.id+')" style="padding:3px 6px;font-size:11px;border-radius:5px;border:1px solid #ddd;font-family:inherit;outline:none"><option value="调改店"'+(sg=='调改店'?' selected':'')+'>调改</option><option value="非调改店"'+(sg=='非调改店'?' selected':'')+'>非调</option></select><button class="set-btn ol" onclick="eS('+s.id+')">改名</button><button class="set-btn ol" onclick="tS('+s.id+')">'+(s.active?'停用':'启用')+'</button><button class="set-btn gh" onclick="dS('+s.id+')">✕</button></span></div>'});
     if(!rs.length)h+='<div style="color:#aaa;font-size:12px;margin:6px 0;">暂无门店</div>';h+='</div>'
   });
   h+='<div style="text-align:center"><button class="set-btn gh" onclick="lSet(\'stores\')" style="padding:6px 14px;font-size:12px;">🔄 刷新</button></div>';return h

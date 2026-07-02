@@ -57,7 +57,7 @@ async function setupPg() {
   if (parseInt(sc.rows[0].c) === 0) {
     await pool.query(`INSERT INTO food_stores (region_id, name, store_group, sort_order) VALUES
       (1,'绿岛花园店','调改店',0),(1,'石岩主场店','非调改店',1),(1,'大朗犀牛坡店','调改店',2),
-      (1,'横岗新世界店','非调改店',3),(1,'松山湖绿荷居店','通用',4),
+      (1,'横岗新世界店','非调改店',3),(1,'松山湖绿荷居店','非调改店',4),
       (1,'松山湖科苑店','调改店',5),(1,'大朗体育馆店','非调改店',6)`);
   }
 
@@ -102,7 +102,7 @@ function initSqlite() {
   }
   if (sqDb.prepare('SELECT COUNT(*) as c FROM stores').get().c === 0) {
     sqDb.transaction(() => {
-      [['绿岛花园店','调改店'],['石岩主场店','非调改店'],['大朗犀牛坡店','调改店'],['横岗新世界店','非调改店'],['松山湖绿荷居店','通用'],['松山湖科苑店','调改店'],['大朗体育馆店','非调改店']].forEach((s,i)=>sqDb.prepare('INSERT INTO stores (region_id,name,store_group,sort_order) VALUES (?,?,?,?)').run(1,s[0],s[1],i));
+      [['绿岛花园店','调改店'],['石岩主场店','非调改店'],['大朗犀牛坡店','调改店'],['横岗新世界店','非调改店'],['松山湖绿荷居店','非调改店'],['松山湖科苑店','调改店'],['大朗体育馆店','非调改店']].forEach((s,i)=>sqDb.prepare('INSERT INTO stores (region_id,name,store_group,sort_order) VALUES (?,?,?,?)').run(1,s[0],s[1],i));
     })();
   }
   if (sqDb.prepare('SELECT COUNT(*) as c FROM dishes').get().c === 0) {
