@@ -161,7 +161,10 @@ async function addStore(name, regionId, storeGroup) {
   else { const max = sqDb.prepare(`SELECT COALESCE(MAX(sort_order),0)+1 as m FROM ${t('stores')}`).get().m; const r = sqDb.prepare(`INSERT INTO ${t('stores')} (region_id,name,store_group,sort_order) VALUES (?,?,?,?)`).run(regionId||0, name, storeGroup||'通用', max); return { lastInsertRowid: r.lastInsertRowid }; }
 }
 async function updateStore(id, name) { await q(`UPDATE ${t('stores')} SET name=$1 WHERE id=$2`, [name, id]); }
-async function updateStoreGroup(id, storeGroup) { await q(`UPDATE ${t('stores')} SET store_group=$1 WHERE id=$2`, [storeGroup, id]); }
+async function updateStoreGroup(id, storeGroup) {
+  if (isPg) await q(`UPDATE ${t('stores')} SET store_group=$1 WHERE id=$2`, [storeGroup, id]);
+  else sqDb.prepare(`UPDATE ${t('stores')} SET store_group=? WHERE id=?`).run(storeGroup, id);
+}
 async function toggleStore(id) { await q(`UPDATE ${t('stores')} SET active = NOT active WHERE id=$1`, [id]); }
 async function deleteStore(id) { await q(`DELETE FROM ${t('stores')} WHERE id=$1`, [id]); }
 
