@@ -86,7 +86,8 @@ function getActiveStoresByRegion(rid) { return db.prepare('SELECT id,name FROM s
 function getAllStores() { return db.prepare('SELECT s.*, r.name as region_name FROM stores s LEFT JOIN regions r ON s.region_id=r.id ORDER BY s.sort_order').all(); }
 function addStore(name, regionId, storeGroup) {
   const max = db.prepare('SELECT COALESCE(MAX(sort_order),0)+1 as m FROM stores').get().m;
-  db.prepare('INSERT INTO stores (region_id, name, store_group, sort_order) VALUES (?,?,?,?)').run(regionId || 0, name, storeGroup || '通用', max);
+  const r = db.prepare('INSERT INTO stores (region_id, name, store_group, sort_order) VALUES (?,?,?,?)').run(regionId || 0, name, storeGroup || '通用', max);
+  return { lastInsertRowid: r.lastInsertRowid };
 }
 function updateStore(id, name) { db.prepare('UPDATE stores SET name=? WHERE id=?').run(name, id); }
 function updateStoreGroup(id, storeGroup) { db.prepare('UPDATE stores SET store_group=? WHERE id=?').run(storeGroup, id); }
